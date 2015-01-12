@@ -2,4 +2,7 @@
 
 class Template{
 	
+	private $tplID;
+
+	
 }
