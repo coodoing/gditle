@@ -1,6 +1,6 @@
 # gditle
 
-1. 模板引擎；用于生成特定的模板，模板的布局结构固定，所有结果均有默认值；
-2. 解析渲染引擎；用于对给定的数据进行解析，并渲染的过程，生成固定的图片;
-3. 前端拖动引擎
+1. template engine;
+2. parse & render engine;
+3. drag & layout engine;
 
