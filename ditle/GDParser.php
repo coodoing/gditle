@@ -66,4 +66,11 @@ class GDParser{
 		
 	}
 
+	public function tidy(){
+
+	}
+
+	public function setRistricted(){
+
+	}
 }

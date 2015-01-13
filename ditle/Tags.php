@@ -4,17 +4,12 @@
  * supported parse tags right now
  */
 class Tags{
-	
-	// unuse the css style attributes
-	private $tags = array(
-			'p'=>'paragraph',
-			'block'=>'span',
-			'b'=>'bold',
-			'i'=>'italic',
-			'un'=>'underline',
 
-		);
-
+	/**
+     * Matched open and closed quotes.
+     *
+     * @var array
+     */
     private $quotes = array(
         '"' => '"',
         "'" => "'",
@@ -30,6 +25,21 @@ class Tags{
         '‘' => '’',
         '”' => '“',
     );
+
+    /**
+     * used tags without the css style attributes.
+     *
+     * @var array
+     */
+    // 
+	private $tags = array(
+			'p'=>'paragraph',
+			'block'=>'span',
+			'b'=>'bold',
+			'i'=>'italic',
+			'un'=>'underline',
+			
+		);
 
     private $attributes = array();
 
