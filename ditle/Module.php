@@ -8,6 +8,12 @@ class Module{
 
 	private $paragraphs;
 
+	private $modules = array(
+			'textfield'=>'m_txt_field',
+			'image'=>'m_img',
+			// ....
+		);
+
 	public function __construct($mname='textfiled', $mtype='0', $ps = array()){
 		$this->mID = uniqid(rand());
 

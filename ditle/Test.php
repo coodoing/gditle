@@ -13,6 +13,8 @@ $parser = new GDParser('<p>ABc<block style="font-style:italic">H</block></p>');
 echo $parser->getInput();
 echo $parser->getOutput();
 
+$parser = new GDParser('<p>ABc<block><i>H</i></block></p>');
+
 $img = new TagGenerator('img');
-$img->src('../img/studio.png')->alt('Example image');
+$img->src('../img/bold.png')->alt('Example image');
 echo (string) $img;

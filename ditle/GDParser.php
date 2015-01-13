@@ -13,23 +13,6 @@ class GDParser{
 	
 	private $imageWidth;
 	private $imageHeight;
-	private $fontColor;
-	private $fontSize;
-	private $fontAngle;
-	private $fontFamily;
-
-	/*
-	 * 0: normal, 1: bold
-	 */
-	private $fontBold;
-	/*
-	 * 0: normal, 1: italic
-	 */
-	private $fontItalic;
-	/*
-	 * 0: normal, 1: underline
-	 */
-	private $fontUnderline;
 
 	/////////////////////////
 	// ordered by priority
@@ -37,19 +20,26 @@ class GDParser{
 	 * bold, italic underline
 	 * values : 000
 	 */
-	private $fonts;
+	private $fontsRule;
 	/*
 	 * list number, dotted, stars
 	 * values : 000
 	 */
-	private $paragraph;
+	private $listRule;
 	/*
 	 * left, center, right
 	 * values : 000
 	 */
-	private $position;	
+	private $posRule;	
 	
+	/*
+     * input string
+	 */
 	private $in;
+
+	/*
+     * output json_array
+	 */
 	private $out;
 
 	public function __construct($in='', $out = array()){
@@ -63,6 +53,10 @@ class GDParser{
 	public function getOutput(){
 		return $this->out;
 	}
+
+
+	///////////////////////////////
+
 
 	public function parse(){
 		

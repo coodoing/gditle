@@ -1,18 +1,33 @@
 <?php
 
 /**
-* A paragraph( or just a line) is the aggregation of the strings
+* A paragraph( or just a line) is the array of the strings
 */
 class Paragraph{
 	
-	private $len;
+	/*
+     * paragraph = string, string, string, ...
+	 */
+	private $pstrings; 
 
-	private $strings;
+	/*
+	 * paragraph = block , block , block, ...
+	 */
+	private $pblocks;
+
+	private $plen;
+
 	private $font;
 	private $position;
-	private $display;
+	private $notelist;
 
-	public function __construct(){
+	public function __construct($strings = array(), $blocks = array(), $len = 0 ){
+		$this->pstrings = $strings;
+		$this->pblocks = $blocks;
+		$this->plen = $len;
 
+		$this->strings = $strings;
+		$this->strings = $strings;
+		$this->strings = $strings;
 	}
 }

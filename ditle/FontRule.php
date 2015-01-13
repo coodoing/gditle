@@ -35,12 +35,46 @@ class FontRule{
 			$this->fontItalic = $defaultChar['fontItalic'];
 			$this->fontUnderline = $defaultChar['fontUnderline'];
 		}else{
-
 		}
+	}
+
+	public function isFontBold(){
+		return (boolean) $this->fontBold;
+	}
+
+	public function isFontItalic(){
+		return (boolean) $this->fontItalic;
+	}
+
+	public function isFontUnderline(){
+		return (boolean) $this->fontUnderline;
 	}
 
 	public function getFont(){
 		return $this;
+	}
+
+	///////////////////
+	// Fluent Interface
+
+	public function setFontBold(){
+		$this->fontBold = 1;
+		return $this;
+	}
+
+	public function setFontBold(){
+		$this->fontBold = 1;
+		return $this;
+	}
+
+	public function setFontBold(){
+		$this->fontBold = 1;
+		return $this;
+	}
+
+	// magic method of __toString()
+	public function __toString(){
+		echo 'font magic';
 	}
 
 }

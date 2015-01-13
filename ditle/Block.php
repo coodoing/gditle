@@ -7,6 +7,10 @@ class Block{
 	private $font;
 
 	public function __construct($block='',$len=0,$font=array()){
-		$this
+		$this->block = $block;
+		$this->len = $len;
+		$thiss->font = $font;
 	}
+
+	
 }
