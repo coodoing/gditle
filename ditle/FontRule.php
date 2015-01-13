@@ -1,6 +1,8 @@
 <?php
 
-class Font{
+require_once 'FontRule.php';
+
+class FontRule{
 	
 	private $fontName;
 
