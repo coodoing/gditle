@@ -13,8 +13,20 @@ $parser = new GDParser('<p>ABc<block style="font-style:italic">H</block></p>');
 echo $parser->getInput();
 echo $parser->getOutput();
 
-$parser = new GDParser('<p>ABc<block><i><un>H</un></i></block></p>');
-
 $img = new TagGenerator('img');
 $img->src('../img/bold.png')->alt('Example image');
 echo (string) $img;
+
+$parser = new GDParser('<p>ABc<block><i><un>H</un></i></block></p>');
+$tokenMap = array(
+	'<p>',
+	'Abc',
+	'<block>',
+	'<i>',
+	'efgF',
+	'</i>',
+	'</block>',
+	'""',
+	'</p>',
+	);
+

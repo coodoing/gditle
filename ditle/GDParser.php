@@ -62,11 +62,27 @@ class GDParser{
 		
 	}
 
+	protected function parseString(){
+
+	}
+
+	protected function parseTokens(){
+		
+	}
+
 	public function render(){
 		
 	}
 
 	public function tidy(){
+
+	}
+
+	public function preParse(){
+
+	}
+
+	public function postParse(){
 
 	}
 
