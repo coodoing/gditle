@@ -1,5 +1,5 @@
 <?php
 
-class ExprAST {
+abstract class ExprAST {
 	
 }

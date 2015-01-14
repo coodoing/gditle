@@ -7,6 +7,7 @@ class Lexer{
 	const T_BOLD = 'b';
 	const T_ITALIC = 'i';
 	const T_UNDERLINE = 'un';
+	const T_VARIABLE_ = 'var';
 	protected $debug = false;
 
 	/*
@@ -47,7 +48,7 @@ class Lexer{
 		T_BOLD => 0x20,
 		T_ITALIC => 0x30,
 		T_UNDERLINE => 0x40,
-
+		T_VARIABLE_ => 0x50,
 		);
 	/*
      * supported token symbols
@@ -113,9 +114,10 @@ class Lexer{
 					if(in_array($tagArr, $tagToken)){
 						// get the tag, be careful about the order		
 						if(!empty($charArr))	{
-							array_push($this->tokenMap,htmlspecialchars($charArr));	
+							$tmp = array($charArr,'T_VARIABLE_',0);
+							array_push($this->tokenMap,htmlspecialchars($charArr));//;	
 						}	
-
+						$tmp = array($tagArr,"$tagArr",1);
 						array_push($this->tokenMap,htmlspecialchars($tagArr));								
 						$tagArr = '';
 						$charArr = '';
@@ -132,11 +134,13 @@ class Lexer{
 		}
 		// post handler
 		if(!empty($charArr)){
+			$tmp = array($charArr,'T_VARIABLE_',0);
 			array_push($this->tokenMap,htmlspecialchars($charArr));
 			$charArr = '';
 		}
 
 		if(!empty($tagArr)){
+			$tmp = array($tagArr,"$tagArr",1);
 			array_push($this->tokenMap,htmlspecialchars($tagArr));
 			$tagArr = '';
 		}
