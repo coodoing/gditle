@@ -32,7 +32,7 @@ class Lexer{
 	}
 
 	protected function getTags(){
-		return array_keys(TokensAttribute::$tokensPriority);
+		return array_keys(TokensAttribute::$tokensNumber);
 	}
 
 	protected function getNextToken(){

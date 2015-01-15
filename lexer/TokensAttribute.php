@@ -1,11 +1,9 @@
 <?php
 
-
 /**
   * common token attribute as priority, number , etc
   */
-class TokensAttribute{
-	
+class TokensAttribute{	
 	
 	const T_PARA_SYMBOL = 'p';
 	const T_BLOCK_SYMBOL = 'block';
@@ -38,54 +36,72 @@ class TokensAttribute{
  	 * token list
 	 */
 	public static $tokensList = array(
-		T_PARA_START,
-		T_BLOCK_START,
-		T_BOLD_START,
-		T_ITALIC_START,
-		T_UNDERLINE_START,
-		T_PARA_END,
-		T_BLOCK_END,
-		T_BOLD_END,
-		T_ITALIC_END,
-		T_UNDERLINE_END,
+		self::T_PARA_START,
+		self::T_BLOCK_START,
+		self::T_BOLD_START,
+		self::T_ITALIC_START,
+		self::T_UNDERLINE_START,
+		self::T_PARA_END,
+		self::T_BLOCK_END,
+		self::T_BOLD_END,
+		self::T_ITALIC_END,
+		self::T_UNDERLINE_END,
+		);
+
+	/*
+	 * token number,  0x01, 0x10, 0x20, ...
+	 */
+	public static $tokensNumber= array(
+		self::T_PARA_START => '200',
+		self::T_PARA_END => '201',
+		self::T_BLOCK_START => '202',
+		self::T_BLOCK_END => '203',
+		self::T_BOLD_START => '204',
+		self::T_BOLD_END => '205',
+		self::T_ITALIC_START => '206',
+		self::T_ITALIC_END => '207',
+		self::T_UNDERLINE_START => '208',
+		self::T_UNDERLINE_END => '209',
 		);
 
 	/*
  	 * token priority, 0x01, 0x10, 0x20, ...
 	 */
 	public static $tokensPriority = array(
-		T_PARA_START => '200',
-		T_PARA_END => '201',
-		T_BLOCK_START => '202',
-		T_BLOCK_END => '203',
-		T_BOLD_START => '204',
-		T_BOLD_END => '205',
-		T_ITALIC_START => '206',
-		T_ITALIC_END => '207',
-		T_UNDERLINE_START => '208',
-		T_UNDERLINE_END => '209',
+
+		self::T_PARA_START => 0xff,
+		self::T_PARA_END => 0xff,
+		self::T_BLOCK_START => 0xfe,
+		self::T_BLOCK_END => 0xfe,
+		self::T_BOLD_START => 0xfd,
+		self::T_BOLD_END => 0xfd,
+		self::T_ITALIC_START => 0xfc,
+		self::T_ITALIC_END => 0xfc,
+		self::T_UNDERLINE_START => 0xfb,
+		self::T_UNDERLINE_END => 0xfb,
+
 		);
 
 	/*
 	 * token pair
 	 */
 	public static $tokenPair = array(
-
-		T_PARA_START=>T_PARA_END,
-		T_BLOCK_START=>T_BLOCK_END,
-		T_BOLD_START=>T_BOLD_END,
-		T_ITALIC_START=>T_ITALIC_END,
-		T_UNDERLINE_START=>T_UNDERLINE_END,
+		self::T_PARA_START=>self::T_PARA_END,
+		self::T_BLOCK_START=>self::T_BLOCK_END,
+		self::T_BOLD_START=>self::T_BOLD_END,
+		self::T_ITALIC_START=>self::T_ITALIC_END,
+		self::T_UNDERLINE_START=>self::T_UNDERLINE_END,
 		);
 
 	/*
      * supported token symbols
 	 */
 	public static $tokenSymbols = array(
-		T_PARA_SYMBOL,
-		T_BLOCK_SYMBOL,
-		T_BOLD_SYMBOL,
-		T_ITALIC_SYMBOL,
-		T_UNDERLINE_SYMBOL,
+		self::T_PARA_SYMBOL,
+		self::T_BLOCK_SYMBOL,
+		self::T_BOLD_SYMBOL,
+		self::T_ITALIC_SYMBOL,
+		self::T_UNDERLINE_SYMBOL,
+		self::T_VARIBLE_SYMBOL,
 		);
 }
