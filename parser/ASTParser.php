@@ -52,26 +52,31 @@ class ASTParser{
 		$lookahead = $this->parsePrimary($nextPos);
 		$meta = new TokenMeta($lookahead);//$this->tokenMeta->getTokenMeta($lookahead);
 		$precedence = $meta->getTokenPriority();
-		echo (json_encode($lhs).'<br>');
+		//echo (json_encode($lhs).'<br>');
 		//assert(json_encode($meta->getTokenPriority()));
 		//assert(0x10);
+		$firstWhilePos = $nextPos;
 		if(!empty($meta)){
 			while($precedence < $maxPrecedence){
 				$varible = $lookahead;
 
-				$rhs = $this->getAdvancedRightToken($nextPos+1);
+				$rhs = $this->getAdvancedRightToken($firstWhilePos+1);
 
-				$lookahead = $this->parsePrimary($nextPos+2);
+				$lookahead = $this->parsePrimary($firstWhilePos+2);
 				$meta =  new TokenMeta($lookahead);
 
+				$secondWhilePos = $firstWhilePos+2;
 				if(!empty($meta)){
-					while(){
-
+					while($lookahead->getTokenPriority()<=$varible->getTokenPriority()){
+						$this->parseExpression($rhs, $lookahead->getTokenPriority());
+						$lookahead = $this->parsePrimary($secondWhilePos+2);
 					}
 				}
-
+				$lhs = '(' . $lhs . $varible . $rhs . ')';
 			}
+			return $lhs;
 		}
+		return '';
 
 		return $lhs;
 	}
@@ -83,9 +88,5 @@ class ASTParser{
 
 	protected function parsePrimary($i = 0){
 		return $this->inArray[$i];
-	}
-
-	public function splitP(){
-
 	}
 }
