@@ -1,65 +1,8 @@
 <?php
 
+require_once 'TokensAttribute.php';
+
 class Lexer{
-
-	const T_PARA = 'p';
-	const T_BLOCK = 'block';
-	const T_BOLD = 'b';
-	const T_ITALIC = 'i';
-	const T_UNDERLINE = 'un';
-	const T_VARIABLE_ = 'var';
-	protected $debug = false;
-
-	/*
- 	 * token identify numbering 
-	 */
-	protected $tokensNumber = array(
-		'<p>' => '200',
-		'</p>' => '201',
-		'<block>' => '202',
-		'</block>' => '203',
-		'<b>' => '204',
-		'</b>' => '205',
-		'<i>' => '206',
-		'</i>' => '207',
-		'<un>' => '208',
-		'</un>' => '209',
-		);
-
-	/*
-	 * token pair
-	 */
-	protected $tokenPair = array(
-
-		'<p>'=>'</p>',
-		'<block>'=>'</block>',
-		'<b>'=>'</b>',
-		'<i>'=>'</i>',
-		'<un>'=>'</un>',
-		);
-
-	/*
-     * token priority
-	 */
-	protected $tokenPriority = array(
-
-		T_PARA => 0x01,
-		T_BLOCK => 0x10,
-		T_BOLD => 0x20,
-		T_ITALIC => 0x30,
-		T_UNDERLINE => 0x40,
-		T_VARIABLE_ => 0x50,
-		);
-	/*
-     * supported token symbols
-	 */
-	protected $tokenSymbols = array(
-		T_PARA,
-		T_BLOCK,
-		T_BOLD,
-		T_ITALIC,
-		T_UNDERLINE,
-		);
 
 	protected $startTag = '<';// <&lt;
 	protected $endTag = '>'; // &gt;
@@ -72,7 +15,7 @@ class Lexer{
 	}
 
 	protected function getTags(){
-		return array_keys($this->tokensNumber);
+		return array_keys(TokensAttribute::$tokensPriority);
 	}
 
 	protected function getNextToken(){
@@ -114,6 +57,7 @@ class Lexer{
 					if(in_array($tagArr, $tagToken)){
 						// get the tag, be careful about the order		
 						if(!empty($charArr))	{
+							// token attribute
 							$tmp = array($charArr,'T_VARIABLE_',0);
 							array_push($this->tokenMap,htmlspecialchars($charArr));//;	
 						}	
