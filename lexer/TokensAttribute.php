@@ -26,8 +26,6 @@ class TokensAttribute{
 	const T_ITALIC_END = '</i>';
 	const T_UNDERLINE_END = '</un>';
 
-	protected $debug = false;
-
 	/*
 	 * token group
 	 */

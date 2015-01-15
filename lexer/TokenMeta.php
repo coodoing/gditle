@@ -30,4 +30,28 @@ class TokenMeta{
 		$this->tokenGroup = $tokenGroup;
 		$this->tokenPriority = $tokenPriority;
 	}
+
+	public function getTokenSymbol(){
+		return $this->tokenSymbol;
+	}
+
+	public function getTokenTag(){
+		return $this->tokenTag;	
+	}
+
+	public function getTokenValue(){
+		return $this->tokenValue;
+	}
+
+	public function getTokenGroup(){
+		return $this->tokenGroup;
+	}
+
+	public function getTokenPriority(){
+		return $this->tokenPriority;
+	}
+
+	public function getTokenMeta(){
+		return $this;
+	}
 }

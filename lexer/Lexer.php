@@ -4,8 +4,25 @@ require_once 'TokensAttribute.php';
 
 class Lexer{
 
+	/*
+ 	 * lex tag 
+ 	 */
 	protected $startTag = '<';// <&lt;
 	protected $endTag = '>'; // &gt;
+
+	/*
+	 * debug or not
+	 */
+	protected $debug = false;
+	/*
+	 * strict 
+	 */
+	protected $strictMode = false;
+	/*
+	 * tidify the output or not
+	 * before or after the lex function ??
+	 */	
+	protected $tidify = false;
 
 	protected $input;
 	protected $tokenMap = array();	
@@ -22,8 +39,20 @@ class Lexer{
 		return $this;
 	}
 
-	protected function tidy(){
+	/*
+	 * tidyify the input string to make sure the $tokenmap correct.
+	 */
+	public function tidy(){
+		//TODO
+		return $this;
+	}
 
+	/*
+	 * convert the token to token meta-data
+	 */
+	public function tokenMetaState(){
+		//TODO
+		return $this;
 	}
 
 	public function lex(){
@@ -46,7 +75,6 @@ class Lexer{
 				}
 				continue;
 			}
-
 			// 
 			if(!empty($tagArr)){
 				if($s == $this->startTag){
