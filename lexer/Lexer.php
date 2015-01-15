@@ -31,8 +31,9 @@ class Lexer{
 		$this->input = $in;
 	}
 
-	protected function getTags(){
-		return array_keys(TokensAttribute::$tokensNumber);
+	protected function getTokenTags(){
+		//return array_keys(TokensAttribute::$tokensNumber);
+		return TokensAttribute::$tokenTags;
 	}
 
 	protected function getNextToken(){
@@ -58,7 +59,7 @@ class Lexer{
 	public function lex(){
 		$str = $this->input;
 		$len = strlen($str);
-		$tagToken = $this->getTags();
+		$tagToken = $this->getTokenTags();
 
 		$charArr = ''; // variable queues
 		$tagArr = ''; // tag queues

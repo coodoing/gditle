@@ -28,14 +28,26 @@ class TokensAttribute{
 	 * token group
 	 */
 	public static $tokenGroup = array(
-		'varible'=>1,
+		'var'=>1,
 		'tag'=>2,
 		);
 
 	/*
- 	 * token list
+     * supported token symbols
 	 */
-	public static $tokensList = array(
+	public static $tokenSymbols = array(
+		self::T_PARA_SYMBOL,
+		self::T_BLOCK_SYMBOL,
+		self::T_BOLD_SYMBOL,
+		self::T_ITALIC_SYMBOL,
+		self::T_UNDERLINE_SYMBOL,
+		self::T_VARIBLE_SYMBOL,
+		);
+
+	/*
+ 	 * token tags
+	 */
+	public static $tokenTags = array(
 		self::T_PARA_START,
 		self::T_BLOCK_START,
 		self::T_BOLD_START,
@@ -83,9 +95,10 @@ class TokensAttribute{
 		);
 
 	/*
-	 * token pair
+	 * token pair map
+	 * <p> - </p>
 	 */
-	public static $tokenPair = array(
+	public static $tokenPairMap = array(
 		self::T_PARA_START=>self::T_PARA_END,
 		self::T_BLOCK_START=>self::T_BLOCK_END,
 		self::T_BOLD_START=>self::T_BOLD_END,
@@ -94,14 +107,20 @@ class TokensAttribute{
 		);
 
 	/*
-     * supported token symbols
+	 * token-symbol map
+	 * <p> - p
+	 * </p> - p
 	 */
-	public static $tokenSymbols = array(
-		self::T_PARA_SYMBOL,
-		self::T_BLOCK_SYMBOL,
-		self::T_BOLD_SYMBOL,
-		self::T_ITALIC_SYMBOL,
-		self::T_UNDERLINE_SYMBOL,
-		self::T_VARIBLE_SYMBOL,
+	public static $tokenSymbolMap = array(
+		self::T_PARA_START => self::T_PARA_SYMBOL,
+		self::T_PARA_END => self::T_PARA_SYMBOL,
+		self::T_BLOCK_START => self::T_BLOCK_SYMBOL,
+		self::T_BLOCK_END => self::T_BLOCK_SYMBOL,
+		self::T_BOLD_START => self::T_BOLD_SYMBOL,
+		self::T_BOLD_END => self::T_BOLD_SYMBOL,
+		self::T_ITALIC_START => self::T_ITALIC_SYMBOL,
+		self::T_ITALIC_END => self::T_ITALIC_SYMBOL,
+		self::T_UNDERLINE_START => self::T_UNDERLINE_SYMBOL,
+		self::T_UNDERLINE_END => self::T_UNDERLINE_SYMBOL,
 		);
 }
