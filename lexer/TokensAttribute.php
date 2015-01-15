@@ -25,6 +25,12 @@ class TokensAttribute{
 	const T_UNDERLINE_END = '</un>';
 
 	/*
+	 * minmax order of token : p > block > b > i > un > __var__
+	 * sugg
+	 */
+	public static $minmax = true;
+
+	/*
 	 * token group
 	 */
 	public static $tokenGroup = array(
@@ -78,6 +84,24 @@ class TokensAttribute{
 
 	/*
  	 * token priority, 0x01, 0x10, 0x20, ...
+	 */
+	public static $tokensPriorityReverse = array(
+
+		self::T_PARA_START => 0x00,
+		self::T_PARA_END => 0x00,
+		self::T_BLOCK_START => 0x10,
+		self::T_BLOCK_END => 0x10,
+		self::T_BOLD_START => 0x20,
+		self::T_BOLD_END => 0x20,
+		self::T_ITALIC_START => 0x30,
+		self::T_ITALIC_END => 0x30,
+		self::T_UNDERLINE_START => 0x40,
+		self::T_UNDERLINE_END => 0x40,
+
+		);
+
+	/*
+ 	 * token priority reverse, 0xff, 0xfe, 0xfd, ...
 	 */
 	public static $tokensPriority = array(
 

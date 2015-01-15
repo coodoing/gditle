@@ -113,7 +113,7 @@ class TokenMeta{
 			$tag = $token;
 			$value = $token;
 			$group = 2;//TokensAttribute::$tokenGroup['var'];
-			$priority = 0; // least proirity
+			$priority = 0; // largest proirity
 
 			/*
 			 * fluent interface

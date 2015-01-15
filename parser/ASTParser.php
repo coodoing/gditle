@@ -11,9 +11,12 @@ require_once '../lexer/TokensAttribute.php';
  */
 class ASTParser{
 	
+	/*
+	 * input string
+	 */
 	protected $in;
 	/*
-	 * include by 
+	 * lexer input array 
 	 */
 	protected $inArray; 
 
@@ -30,38 +33,56 @@ class ASTParser{
 	 */
 	public function astParse(){
 
-		$start = $this->parsePrimary($this->inArray, 0);
+		$start = $this->parsePrimary(0);
 		$startMeta = new TokenMeta($start);
 		$priority = $startMeta->getTokenPriority();
 		//echo $startMeta->getTokenValue();		
-		$this->parseExpression($priority, $start, 1);
+		$this->parseExpression($priority, 1, $start);
 	}
 
 	/**
 	 * primary parse expression 
 	 * 
-	 * @param string $minPrecedence min priority util now, min_precedence
+	 * @param string $maxPrecedence max priority util now, min_precedence
 	 * @param integer $nextPos next tokens' position, lookahead-peek next token
-	 * @param string $currentToken The current token element, lhs	  
+	 * @param string $currentTok The current token element, lhs	  
 	 */
-	public function parseExpression($minPrecedence, $nextPos, $currentToken = ''){
-		$nextTok = $this->parsePrimary($this->inArray, $nextPos);
-		$meta = new TokenMeta($nextTok);//$this->tokenMeta->getTokenMeta($nextTok);
-		$nextPriority = $meta->getTokenPriority();
-		//assert(json_encode($nextTok));
+	public function parseExpression($maxPrecedence, $nextPos, $currentTok = ''){
+		$lhs = $currentTok;
+		$lookahead = $this->parsePrimary($nextPos);
+		$meta = new TokenMeta($lookahead);//$this->tokenMeta->getTokenMeta($lookahead);
+		$precedence = $meta->getTokenPriority();
+		echo (json_encode($lhs).'<br>');
 		//assert(json_encode($meta->getTokenPriority()));
 		//assert(0x10);
 		if(!empty($meta)){
-			while($nextPriority>=$minPrecedence){
-				$varible = $nextTok;
+			while($precedence < $maxPrecedence){
+				$varible = $lookahead;
 
-				
+				$rhs = $this->getAdvancedRightToken($nextPos+1);
+
+				$lookahead = $this->parsePrimary($nextPos+2);
+				$meta =  new TokenMeta($lookahead);
+
+				if(!empty($meta)){
+					while(){
+
+					}
+				}
+
 			}
 		}
+
+		return $lhs;
 	}
 
-	protected function parsePrimary($arr = array(), $i = 0){
-		return $arr[$i];
+	protected function getAdvancedRightToken($nextPos){
+		$rhs = $this->parsePrimary($nextPos);
+		return $rhs;
+	}
+
+	protected function parsePrimary($i = 0){
+		return $this->inArray[$i];
 	}
 
 	public function splitP(){
