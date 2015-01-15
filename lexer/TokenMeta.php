@@ -29,8 +29,8 @@ class TokenMeta{
 	 * function overloading unable in PHP
 	 */
 	public function __construct($token = '', $tokenSymbol='', $tokenTag='', $tokenValue='', $tokenGroup='', $tokenPriority=''){
-		if(empty($token)){
-
+		if(!empty($token)){
+			$this->genTokenMetaFromToken($token);
 		}else{
 			$this->tokenSymbol = $tokenSymbol;
 			$this->tokenTag = $tokenTag;
@@ -86,14 +86,15 @@ class TokenMeta{
 	}
 
 	public function getTokenMeta($token = array()){
-		if(empty($token)){
+		/*if(empty($token)){
 			return $this;
 		}else{
-			return $this->getTokenMetaFromToken($token);
-		}		
+			return $this->genTokenMetaFromToken($token);
+		}*/		
+		return $this;
 	}
 
-	protected function getTokenMetaFromToken($token = array()){
+	protected function genTokenMetaFromToken($token = array()){
 		//TODO
 		$tokenTags = TokensAttribute::$tokenTags;
 		if(in_array($token, $tokenTags)){
@@ -103,8 +104,10 @@ class TokenMeta{
 			$group = 1;//TokensAttribute::$tokenGroup['tag'];
 			$priority = TokensAttribute::$tokensPriority[$token];
 
+			/*
+			 * fluent interface
+			 */
 			$this->setTokenSymbol($symbol)->setTokenTag($tag)->setTokenValue($value)->setTokenGroup($group)->setTokenPriority($priority);
-
 		}else{
 			$symbol = TokensAttribute::T_VARIBLE_SYMBOL;
 			$tag = $token;
@@ -112,9 +115,10 @@ class TokenMeta{
 			$group = 2;//TokensAttribute::$tokenGroup['var'];
 			$priority = 0; // least proirity
 
+			/*
+			 * fluent interface
+			 */
 			$this->setTokenSymbol($symbol)->setTokenTag($tag)->setTokenValue($value)->setTokenGroup($group)->setTokenPriority($priority);
 		}
-
-		return $this;
 	}
 }
