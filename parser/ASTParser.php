@@ -41,17 +41,22 @@ class ASTParser{
 	 * primary parse expression 
 	 * 
 	 * @param string $minPrecedence min priority util now, min_precedence
-	 * @param string $currentToken The token element, lhs
-	 * @param integer $nextPos next tokens' position, lookahead-peek next token 
+	 * @param integer $nextPos next tokens' position, lookahead-peek next token
+	 * @param string $currentToken The current token element, lhs	  
 	 */
-	public function parseExpression($minPrecedence, $currentToken, $nextPos){
+	public function parseExpression($minPrecedence, $nextPos, $currentToken = ''){
 		$nextTok = $this->parsePrimary($this->inArray, $nextPos);
 		$meta = new TokenMeta($nextTok);//$this->tokenMeta->getTokenMeta($nextTok);
-		assert(json_encode($nextTok));
-		assert(json_encode($meta->getTokenPriority()));
-		assert(0x10);
+		$nextPriority = $meta->getTokenPriority();
+		//assert(json_encode($nextTok));
+		//assert(json_encode($meta->getTokenPriority()));
+		//assert(0x10);
 		if(!empty($meta)){
+			while($nextPriority>=$minPrecedence){
+				$varible = $nextTok;
 
+				
+			}
 		}
 	}
 
