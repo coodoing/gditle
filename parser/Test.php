@@ -2,8 +2,6 @@
 
 require_once 'ASTParser.php';
 
-$str = '<p>ABc<block><i>yuestg</i></block></p>';
-$parser = new ASTParser($str);
 
 $keywords = preg_split("/[\s,]+/", "hypertext language, programming");
 print_r($keywords);
@@ -11,15 +9,23 @@ print_r($keywords);
 $block = preg_split('/<block>+/',$str);
 //var_dump($block);
 
+$str = '<p>ABc<block><i>yuestg</i></block></p>';
 $tokenMap = array(
+	'dssd',
 	'<p>',
 	'Abc',
 	'<block>',
-	'<i>',
-	'efgF',
-	'</i>',
+	'readline_callback_handler_install(prompt, callback)',
 	'</block>',
-	'""',
+	'<block>',
+	'terwyui',
+	'</block>',
+	'<block>',
+	'iconv_strlen(str)',
+	'</block>',
+	'"cc"',
 	'</p>',
 	);
+$parser = new ASTParser($str, $tokenMap);
+$parser->astParse();
 

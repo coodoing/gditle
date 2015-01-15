@@ -3,6 +3,8 @@
 require_once 'BinaryExprAST.php';
 require_once 'TagExprAST.php';
 require_once 'VariableExprAST.php';
+require_once '../lexer/TokenMeta.php';
+require_once '../lexer/TokensAttribute.php';
 
 /*
  * http://llvm-tutorial-cn.readthedocs.org/en/latest/chapter-2.html
@@ -15,30 +17,40 @@ class ASTParser{
 	 */
 	protected $inArray; 
 
+	protected $tokenMeta;
+
 	public function __construct($in = '', $inArray = array()){
 		$this->in = $in;
 		$this->inArray = $inArray;
+		//$this->tokenMeta = new TokenMeta();
 	}
 
 	/*
 	 * operator-precedence parser 
 	 */
 	public function astParse(){
-		$count = count($this->inArray);
-		echo $count;
-		
+
 		$start = $this->parsePrimary($this->inArray, 0);
-		$this->parseExpression($start, 0, 1);
+		$startMeta = new TokenMeta($start);
+		$priority = $startMeta->getTokenPriority();
+		//echo $startMeta->getTokenValue();		
+		$this->parseExpression($priority, $start, 1);
 	}
 
-	public function parseExpression($element, $precedence, $next){
-		$tok = $this->inArray[$next];
-
-	}
-
-	public function getTokenDetail($to){
-		$tokens = array_keys($this->tokensNumber);
-		if(in_array($to, $tokens)){
+	/**
+	 * primary parse expression 
+	 * 
+	 * @param string $minPrecedence min priority util now, min_precedence
+	 * @param string $currentToken The token element, lhs
+	 * @param integer $nextPos next tokens' position, lookahead-peek next token 
+	 */
+	public function parseExpression($minPrecedence, $currentToken, $nextPos){
+		$nextTok = $this->parsePrimary($this->inArray, $nextPos);
+		$meta = new TokenMeta($nextTok);//$this->tokenMeta->getTokenMeta($nextTok);
+		assert(json_encode($nextTok));
+		assert(json_encode($meta->getTokenPriority()));
+		assert(0x10);
+		if(!empty($meta)){
 
 		}
 	}
