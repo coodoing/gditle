@@ -2,12 +2,8 @@
 
 require_once 'ASTParser.php';
 
-
 $keywords = preg_split("/[\s,]+/", "hypertext language, programming");
-print_r($keywords);
-
-$block = preg_split('/<block>+/',$str);
-//var_dump($block);
+//print_r($keywords);
 
 $str = '<p>ABc<block><i>yuestg</i></block></p>';
 $tokenMap = array(

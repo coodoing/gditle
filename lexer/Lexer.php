@@ -5,7 +5,7 @@ require_once 'TokensAttribute.php';
 class Lexer{
 
 	/*
- 	 * lex tag 
+ 	 * token tag  
  	 */
 	protected $startTag = '<';// <&lt;
 	protected $endTag = '>'; // &gt;
@@ -15,14 +15,29 @@ class Lexer{
 	 */
 	protected $debug = false;
 	/*
-	 * strict 
+	 * strict the input or not
+	 * <p /> tag instead of <p>...</p>
+	 * suggested setting true
 	 */
-	protected $strictMode = false;
+	protected $strictMode = true;
 	/*
 	 * tidify the output or not
-	 * before or after the lex function ??
+	 * <p> without the </p> tag
+	 * before or after the lex procedure ??
+	 * suggested setting true
 	 */	
-	protected $tidify = false;
+	protected $tidify = true;
+
+	/*
+	 * scan the empty token or not
+	 * suggested setting true
+	 */
+	protected $empty = true;
+
+	/*
+	 * options of the lexer
+	 */
+	protected $option = array();
 
 	protected $input;
 	protected $tokenMap = array();	

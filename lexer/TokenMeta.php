@@ -26,6 +26,11 @@ class TokenMeta{
 	protected $tokenPriority; 
 
 	/*
+	 * token position
+	 */
+	protected $tokenPos;
+
+	/*
 	 * function overloading unable in PHP
 	 */
 	public function __construct($token = '', $tokenSymbol='', $tokenTag='', $tokenValue='', $tokenGroup='', $tokenPriority=''){
@@ -85,6 +90,15 @@ class TokenMeta{
 		return $this->tokenPriority;
 	}
 
+	public function setTokenPos($pos){
+		$this->tokenPos = $pos;
+		return $this;
+	}
+
+	public function getTokenPos(){
+		return $this->pos;
+	}
+
 	public function getTokenMeta($token = array()){
 		/*if(empty($token)){
 			return $this;
@@ -113,7 +127,7 @@ class TokenMeta{
 			$tag = $token;
 			$value = $token;
 			$group = 2;//TokensAttribute::$tokenGroup['var'];
-			$priority = 0; // least proirity
+			$priority = 0; // largest proirity
 
 			/*
 			 * fluent interface
