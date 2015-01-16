@@ -45,6 +45,9 @@ class Lexer{
 	 */
 	public function tidy(){
 		//TODO
+		$this->input = preg_replace('~<!\[CDATA\[(.*?)\]\]>~is', '', $this->input);
+        $this->input = preg_replace('~<!--(.*?)-->~is', '', $this->input);
+        $this->input = preg_replace('~<!DOCTYPE.*?>~is', '', $this->input);
 		return $this;
 	}
 
