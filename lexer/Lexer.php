@@ -101,6 +101,7 @@ class Lexer{
 					$tagArr = $s;
 				}elseif($s == $this->endTag){
 					$tagArr .= $s; // <pxxx>
+					//preg_match
 					if(in_array($tagArr, $tagToken)){
 						// get the tag, be careful about the order		
 						if(!empty($charArr))	{
@@ -139,4 +140,11 @@ class Lexer{
 		print_r($this->tokenMap);
 		return $this->tokenMap;
 	}	
+
+	/*
+	 * preg_match the token 
+	 */
+	protected function isTokenMatch($token){
+		//TODO
+	}
 }
