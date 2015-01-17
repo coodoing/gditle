@@ -260,7 +260,7 @@ class ASTParser{
 		$endTagExpr = new TagExprAST($endTagMeta);
 
 		$varExpr = new VariableExprAST($varToken, $tagRule->getFontRule());
-		$expr = new BinaryExprAST($varExpr, $startTagExpr, $endTagExpr);
+		$expr = new BinaryExprAST($startTagExpr, $varExpr, $endTagExpr);
 		return array(
 			'var'=>$var,
 			'expr' => $expr,

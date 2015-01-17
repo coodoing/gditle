@@ -27,13 +27,13 @@ $tokenMap = array(
 // rec parse
 $tokenMap = array(
 	'<p>',
-	//'pdesc',
+	'pdesc',
 	'<block>',
 	'block_desc',
-	'<b>',
+	/*'<b>',
 	'u>u<LLLLL',
 	'</b>',
-	//'start',
+	'start',*/
 	'</block>',
 	'end',
 	/*'<block>',

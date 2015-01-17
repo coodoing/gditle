@@ -11,9 +11,10 @@ class BinaryExprAST extends ExprAST{
 
 	protected $vari;
 
-	public function __construct($var, $start, $end){
-		$this->vari = $var;
+	public function __construct($start, $var, $end){
+		
 		$this->startTag = $start;
+		$this->vari = $var;
 		$this->endTag = $end;
 	}
 	
