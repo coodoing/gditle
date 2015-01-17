@@ -1,15 +1,17 @@
 <?php
 
+require_once 'Rule.php';
 require_once 'FontRule.php';
 
 class DVariable{
+
 	private $vari;
 
-	private $font;
+	private $fontRule;
 
-	public function __construct($vari){
+	public function __construct($vari, $fontRule = array()){
 		$this->vari = $vari;
-		$font = new FontRule;
+		$this->fontRule = $fontRule;
 	}
 	
 	public function __toString(){

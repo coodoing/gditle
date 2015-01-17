@@ -24,7 +24,7 @@ class FontRule{
 	 */
 	private $fontUnderline;
 
-	public function __construct(){
+	public function __construct($font = array()){
 		if(!empty($defaultChar)){
 			$this->fontColor = $defaultChar['fontColor'];
 			$this->fontSize = $defaultChar['fontSize'];
@@ -35,6 +35,9 @@ class FontRule{
 			$this->fontItalic = $defaultChar['fontItalic'];
 			$this->fontUnderline = $defaultChar['fontUnderline'];
 		}else{
+			//TODO
+
+			
 		}
 	}
 

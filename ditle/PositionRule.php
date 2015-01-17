@@ -12,10 +12,19 @@ class PositionRule{
 	 */
 	private $posType;
 
-	public function __construct($posType = '2', $posName = 'right'){
+	public function __construct($pos){
 
-		$this->posType = $posType;
-		$this->posName = $posName;
+		if(empty($pos)){
+			$posType = '2';
+			$posName = 'right';
+			$this->posType = $posType;
+			$this->posName = $posName;
+		}else{
+			//TODO
+
+			
+		}
+		
 	}
 
 }

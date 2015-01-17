@@ -15,9 +15,16 @@ class ListRule{
 	 */
 	private $liType;
 
-	public function __construct($liType = '0', $liName = 'normal'){
+	public function __construct($list){
+		if(empty($list)){
+			$liType = '0';
+			$liName = 'normal';
+			$this->liType = $liType;
+			$this->liName = $liName;
+		}else{
+			//TODO
 
-		$this->liType = $liType;
-		$this->liName = $liName;
+		}
+		
 	}
 }
