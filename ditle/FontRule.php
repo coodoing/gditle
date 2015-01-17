@@ -62,12 +62,12 @@ class FontRule{
 		return $this;
 	}
 
-	public function setFontBold(){
+	public function setFontItalic(){
 		$this->fontBold = 1;
 		return $this;
 	}
 
-	public function setFontBold(){
+	public function setFontUnderline(){
 		$this->fontBold = 1;
 		return $this;
 	}

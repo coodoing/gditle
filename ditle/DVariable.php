@@ -1,5 +1,7 @@
 <?php
 
+require_once 'FontRule.php';
+
 class DVariable{
 	private $vari;
 
@@ -7,7 +9,7 @@ class DVariable{
 
 	public function __construct($vari){
 		$this->vari = $vari;
-		$font = new Font;
+		$font = new FontRule;
 	}
 	
 	public function __toString(){
