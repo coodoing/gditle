@@ -12,7 +12,7 @@ class TokenMeta{
 	 */
 	protected $tokenTag; 
 	/*
-	 * '<p>' 
+	 * '<p style="color:0,100,200">' 
 	 */
 	protected $tokenValue; 
 	/*

@@ -55,8 +55,9 @@ class Lexer{
 		return $this;
 	}
 
-	/*
-	 * tidyify the input string to make sure the $tokenmap correct.
+	/**
+	 * tidify the input string to make sure the $tokenmap correct.
+	 * 
 	 */
 	public function tidy(){
 		//TODO

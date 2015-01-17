@@ -54,17 +54,27 @@ class ASTParser{
 		$tagArr = array();
 		$varArr = array();
 		$binaryArr = array(); // combination of the tagToken and varToken
+
 		$exprArr = array(); // ast 
 
 		$source = $this->inArray;
-		for($i=0; $i<count($source); $i++){
-			$current = $source[$i];
-			$meta = $this->parsePrimaryTokenMeta($i);
+		$len = $this->getParseArrayLength();
 
-			if($meta->getTokenGroup() == 2){
-				array_push($varArr, $current);
+		$flag = 0;
+
+		for($i=0; $i<$len; $i++){
+			$current = $source[$i];
+			$currentMeta = $this->parsePrimaryTokenMetaByObj($current);
+
+			if($currentMeta->getTokenGroup() == 2){
+				// even empty string will push into the array to make sure the following procedure
+				if($flag == 0){
+					array_push($varArr, $current);
+				}else{
+					$flag = 0;
+				}				
 			}else{
-				if(empty($tagArr)){
+				if(empty($tagArr)){						
 					array_push($tagArr, $current);
 				}else{
 					$lastIdx = count($tagArr)-1;
@@ -80,8 +90,32 @@ class ASTParser{
 						}else{
 							$lastVar = '';
 						}
+
+						/************************************/
+						/**
+						* main combination algorithm
+						*/
 						$binary = $this->combineBinaryExpr($lastTag, $lastVar, $current);
-						array_push($varArr, $binary['var']);
+						//echo $lastTag.'-'.$lastVar.'-'.$current.'='.$binary['var'].'<br/>';
+
+						/*pre combination*/
+						$_lhs = '';
+						if(!empty($varArr)){
+							$_lhs = array_pop($varArr);
+						}
+
+						/*post combination or not*/
+						$_rhs = '';
+						if($i+1 < $len){
+							$next = $source[$i+1];
+							$nextMeta = $this->parsePrimaryTokenMetaByObj($next);
+							if(!empty($next) && $nextMeta->getTokenGroup() == 2){
+								$_rhs = $next;
+								$flag = 1;
+							}
+						}
+						
+						array_push($varArr, $_lhs . $binary['var'] . $_rhs);
 					}else{
 						trigger_error("Input exception");
 						exit;
@@ -89,7 +123,6 @@ class ASTParser{
 				}
 			}
 		}
-
 
 		if(empty($varArr)){
 			$parseRet = '';
@@ -104,6 +137,11 @@ class ASTParser{
 
 	/**
 	 * comination of binary expr
+	 * @param string $startTagToken
+	 * @param string $varToken
+	 * @param string $endTagToken
+	 *
+	 * @return BinaryExprAST
 	 */
 	protected function combineBinaryExpr($startTagToken, $varToken, $endTagToken){
 		$var = '(' . $startTagToken . $varToken . $endTagToken . ')';
@@ -113,8 +151,8 @@ class ASTParser{
 		$startTagMeta = $this->parsePrimaryTokenMetaByObj($startTagToken);
 		$endTagMeta = $this->parsePrimaryTokenMetaByObj($endTagToken);
 
-		$startTagExpr = new TagExprAST($startTagMeta->getTokenSymbol(), $startTagToken, $this->getTagTokenStyle($startTagToken));
-		$endTagExpr = new TagExprAST($endTagMeta->getTokenSymbol(), $endTagToken, $this->getTagTokenStyle($endTagToken));
+		$startTagExpr = new TagExprAST($startTagMeta->getTokenSymbol(), $startTagToken, $this->parseTagTokenStyle($startTagToken));
+		$endTagExpr = new TagExprAST($endTagMeta->getTokenSymbol(), $endTagToken, $this->parseTagTokenStyle($endTagToken));
 
 		$expr = new BinaryExprAST($varExpr, $startTagExpr, $endTagExpr);
 		return array(
@@ -130,7 +168,7 @@ class ASTParser{
 	 * @param string $currentToken
 	 * @return integer -1, 0, 1
 	 * 1  : push the $current to the stack
-	 * 0  : pop out the $last of the stack
+	 * 0  : pop out the $last of the stack when the tags are sysmtric
 	 * -1 : input exception
 	 */
 	protected function priorityComparision($lastToken, $currentToken){
@@ -140,13 +178,22 @@ class ASTParser{
 		if($lastMeta->getTokenPriority() > $currentMeta->getTokenPriority()){
 			return 1;
 		}elseif($lastMeta->getTokenPriority() == $currentMeta->getTokenPriority()){
-			return 0;
+			if(TokensAttribute::$tokenPairMap[$lastMeta->getTokenTag()] == $currentMeta->getTokenTag()){
+				return 0;
+			}else{
+				return 1;
+			}
 		}else{
 			return -1;
 		}
 	}
 
-	protected function getTagTokenStyle(){
+	/**
+	 * parse the tagtoken as '<p style = "color:0,131,125">' to get the style element
+	 * @param string $tagToken
+	 * @return string 
+	 */
+	protected function parseTagTokenStyle($tagToken){
 		//TODO
 		return '';
 	}
@@ -161,9 +208,9 @@ class ASTParser{
 	public function primaryParseExpression($maxPrecedence, $nextPos, $currentTok = ''){
 		$lhs = $currentTok;
 		$lookahead = $this->parsePrimary($nextPos);
-		$meta = new TokenMeta($lookahead);//$this->tokenMeta->getTokenMeta($lookahead);
+		$meta = new TokenMeta($lookahead);
 		$precedence = $meta->getTokenPriority();
-		//echo (json_encode($lhs).'<br>');
+		//assert(json_encode($lhs));
 		//assert(json_encode($meta->getTokenPriority()));
 		//assert(0x10);
 		$firstWhilePos = $nextPos;
@@ -210,5 +257,9 @@ class ASTParser{
 	protected function parsePrimaryTokenMetaByObj($tok){
 		$meta = new TokenMeta($tok);
 		return $meta;
+	}
+
+	protected function getParseArrayLength(){
+		return count($this->inArray);
 	}
 }
