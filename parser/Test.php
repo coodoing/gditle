@@ -22,6 +22,21 @@ $tokenMap = array(
 	'"cc"',
 	'</p>',
 	);
+
+$tokenMap = array(
+	'<p>',
+	'<block>',
+	'u>',
+	'</block>',
+	'<block>',
+	'china',
+	'</block>',
+	'<un>',
+	'beijing',
+	'</un>',
+	'</p>'
+	);
 $parser = new ASTParser($str, $tokenMap);
+//print_r($tokenMap);
 $parser->astParse();
 

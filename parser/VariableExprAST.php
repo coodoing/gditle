@@ -7,8 +7,8 @@ class VariableExprAST extends ExprAST{
 	
 	protected $varible;
 
-	public function __construct(){
-		$this->varible = new DVarible;
+	public function __construct($var){
+		$this->varible = new DVariable($var);
 	}
 
 	public function getVarible(){
