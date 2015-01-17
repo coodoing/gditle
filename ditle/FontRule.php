@@ -1,6 +1,7 @@
 <?php
 
 require_once 'FontRule.php';
+require_once 'Config.php';
 
 class FontRule{
 	

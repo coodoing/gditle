@@ -5,15 +5,12 @@ require_once '../ditle/DVariable.php';
 
 class TagExprAST extends ExprAST{
 	
-	protected $tag;
+	
+	protected $tagMeta;
+	protected $tagRule;
 
-	protected $tagValue;
-
-	protected $tagStyle;
-
-	public function __construct($tag, $tagValue, $tagStyle){
-		$this->tag = $tag;
-		$this->tagValue = $tagValue;
-		$this->tagStyle = $tagStyle;
+	public function __construct($tagMeta, $tagRule = ''){
+		$this->tagMeta = $tagMeta;
+		$this->tagRule = $tagRule;
 	}
 }

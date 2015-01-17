@@ -9,7 +9,7 @@ class DVariable{
 
 	private $fontRule;
 
-	public function __construct($vari, $fontRule = array()){
+	public function __construct($vari, $fontRule = null){
 		$this->vari = $vari;
 		$this->fontRule = $fontRule;
 	}
