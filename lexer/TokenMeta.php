@@ -17,7 +17,8 @@ class TokenMeta{
 	protected $tokenValue; 
 	/*
 	 * used for binary expression ( tag or varible)
-	 * tag
+	 * 1 : tag
+	 * 2 : variable
 	 */
 	protected $tokenGroup; 
 	/*
@@ -100,11 +101,6 @@ class TokenMeta{
 	}
 
 	public function getTokenMeta($token = array()){
-		/*if(empty($token)){
-			return $this;
-		}else{
-			return $this->genTokenMetaFromToken($token);
-		}*/		
 		return $this;
 	}
 
@@ -113,6 +109,7 @@ class TokenMeta{
 		$tokenTags = TokensAttribute::$tokenTags;
 		if(in_array($token, $tokenTags)){
 			$symbol = TokensAttribute::$tokenSymbolMap[$token];
+			// preg_match
 			$tag = $token;
 			$value = $token;
 			$group = 1;//TokensAttribute::$tokenGroup['tag'];
