@@ -3,19 +3,21 @@
 require_once 'ExprAST.php';
 require_once 'TagExprAST.php';
 require_once 'VariableExprAST.php';
+require_once 'BlockExprAST.php';
 
 class BinaryExprAST extends ExprAST{
 
 	protected $startTag;
-	protected $endTag;
 
-	protected $vari;
+	protected $block;
 
-	public function __construct($start, $var, $end){
-		
+	protected $endTag;	
+
+	/*protected $vari;
+	protected $nextBinary;*/
+	public function __construct($start, $block, $end){		
 		$this->startTag = $start;
-		$this->vari = $var;
+		$this->block = $block;
 		$this->endTag = $end;
-	}
-	
+	}	
 }

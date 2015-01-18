@@ -30,10 +30,10 @@ $tokenMap = array(
 	'pdesc',
 	'<block>',
 	'block_desc',
-	/*'<b>',
+	'<b>',
 	'u>u<LLLLL',
 	'</b>',
-	'start',*/
+	'start',
 	'</block>',
 	'end',
 	/*'<block>',

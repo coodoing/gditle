@@ -3,6 +3,7 @@
 require_once 'BinaryExprAST.php';
 require_once 'TagExprAST.php';
 require_once 'VariableExprAST.php';
+require_once 'BlockExprAST.php';
 require_once '../lexer/TokenMeta.php';
 require_once '../lexer/TokensAttribute.php';
 
@@ -103,10 +104,9 @@ class ASTParser{
 
 						/************************************/
 						/**
-						 * main combination algorithm
+						 * combination algorithm
 						 */
-						$binary = $this->combineBinaryExpr($lastTag, $lastVar, $current);
-						//assert($lastTag.'-'.$lastVar.'-'.$current.'='.$binary['var'].'<br/>');
+						$binary = $this->combineBinaryExpr($lastTag, $lastVar, $current, null);
 
 						/*pre combination or not*/
 						$_lhs = '';
@@ -154,19 +154,13 @@ class ASTParser{
 		$source = $this->inArray;
 		$len = $this->getParseArrayLength();
 
-		$flag = 0;
-
 		for($i=0; $i<$len; $i++){
 			$current = $source[$i];
 			$currentMeta = $this->parsePrimaryTokenMetaByObj($current);
 
 			if($currentMeta->getTokenGroup() == 2){
 				// even empty string will push into the array to make sure the following procedure
-				if($flag == 0){
-					array_push($varArr, $current);
-				}else{
-					$flag = 0;
-				}				
+				array_push($varArr, $current);						
 			}else{
 				if(empty($tagArr)){						
 					array_push($tagArr, $current);
@@ -187,13 +181,18 @@ class ASTParser{
 
 						/************************************/
 						/**
-						 * main combination algorithm
+						 * combination algorithm
 						 */
-						$binary = $this->combineBinaryExpr($lastTag, $lastVar, $current);
+						/** the first time into the binaryExprArr*/
+						$_block = null;
+						if(!empty($binaryExprArr)){
+							$_block = array_pop($binaryExprArr);
+						}
+						$binary = $this->combineBinaryExpr($lastTag, $lastVar, $current, $_block);
 
 						if(!empty($tagArr)){							
 							$_tag = $tagArr[count($tagArr)-1];
-							$_tagRule = $this->parseTagTokenStyle($_tag);
+							$_tagRule = $this->parseTagTokenRule($_tag);
 						}
 
 						$_lhsExpr = null;
@@ -206,15 +205,17 @@ class ASTParser{
 						if($i+1 < $len){
 							$next = $source[$i+1];
 							$nextMeta = $this->parsePrimaryTokenMetaByObj($next);
-							if(!empty($next) && $nextMeta->getTokenGroup() == 2){
-								
+							if(!empty($next) && $nextMeta->getTokenGroup() == 2){								
 								$_rhsExpr = new VariableExprAST($next, $_tagRule->getFontRule());
-								$flag = 1;
 							}
 						}
 
+						$combinationExpr = new BlockExprAST($_lhsExpr, $binary['expr'], $_rhsExpr);
 						$combinationExpr = array($_lhsExpr, $binary['expr'], $_rhsExpr);
-
+						/** final process */
+						if(empty($_lhsExpr) && empty($_rhsExpr)){
+							$combinationExpr = $binary['expr'];
+						}						
 						array_push($binaryExprArr, $combinationExpr);
 					}else{
 						trigger_error("Input exception");
@@ -224,20 +225,13 @@ class ASTParser{
 			}
 		}
 
-		if(empty($varArr)){
+		print_r($binaryExprArr);
+		if(empty($binaryExprArr)){
 			$parseRet = '';
 		}else{
-			$parseRet = array_pop($varArr);
-		}
-
-		print_r($binaryExprArr);
+			$parseRet = array_pop($binaryExprArr);
+		}	
 		return $parseRet;
-
-	}
-
-	protected function combineParenthExpr($startTagToken, $varToken, $endTagToken){
-		$var = '(' . $startTagToken . $varToken . $endTagToken . ')';
-		return $var;
 	}
 
 	/**
@@ -248,19 +242,22 @@ class ASTParser{
 	 *
 	 * @return BinaryExprAST
 	 */
-	protected function combineBinaryExpr($startTagToken, $varToken, $endTagToken){
+	protected function combineBinaryExpr($startTagToken, $varToken, $endTagToken, $block){
 		$var = '(' . $startTagToken . $varToken . $endTagToken . ')';
 		$expr = array();
 		
 		$startTagMeta = $this->parsePrimaryTokenMetaByObj($startTagToken);
 		$endTagMeta = $this->parsePrimaryTokenMetaByObj($endTagToken);
 
-		$tagRule = $this->parseTagTokenStyle($startTagToken);
+		$tagRule = $this->parseTagTokenRule($startTagToken);
 		$startTagExpr = new TagExprAST($startTagMeta, $tagRule);
 		$endTagExpr = new TagExprAST($endTagMeta);
 
 		$varExpr = new VariableExprAST($varToken, $tagRule->getFontRule());
-		$expr = new BinaryExprAST($startTagExpr, $varExpr, $endTagExpr);
+		if(empty($block)){
+			$block = new BlockExprAST($varExpr, null, null);
+		}		
+		$expr = new BinaryExprAST($startTagExpr, $block, $endTagExpr);
 		return array(
 			'var'=>$var,
 			'expr' => $expr,
@@ -299,7 +296,7 @@ class ASTParser{
 	 * @param string $tagToken
 	 * @return Rule  
 	 */
-	protected function parseTagTokenStyle($tagToken){
+	protected function parseTagTokenRule($tagToken){
 		//TODO
 		$font = new FontRule;
 		$rule = new Rule($font);
@@ -369,5 +366,12 @@ class ASTParser{
 
 	protected function getParseArrayLength(){
 		return count($this->inArray);
+	}
+
+	/**
+	 * Cache the AST of the input string or array
+	 */
+	protected function cache(){
+
 	}
 }
