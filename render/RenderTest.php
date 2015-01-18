@@ -2,14 +2,11 @@
 
 require_once 'GDRender.php';
 
-$parser = new GDRender('input');
-echo $parser->getInput();
 
-$parser = new GDRender('<p>ABc<block style="font-style:italic">H</block></p>');
-echo $parser->getInput();
-echo $parser->getOutput();
+$render = new GDRender('<p>ABc<block style="font-style:italic">H</block></p>');
+//echo $render->getInput();
 
-$parser = new GDRender('<p>ABc<block><i><un>H</un></i></block></p>');
+$render = new GDRender('<p>ABc<block><i><un>H</un></i></block></p>');
 $tokenMap = array(
 	'<p>',
 	'Abc',
@@ -22,3 +19,6 @@ $tokenMap = array(
 	'</p>',
 	);
 
+header('Content-Type: image/jpeg');
+$render = new GDRender();
+$render->createImage('Testing code');
