@@ -89,26 +89,21 @@ class GDRender{
 	} 
 
 	protected function createImageFromJpeg($imgFile){
-	    /* attemp to open */
 	    $im = @imagecreatefromjpeg($imgFile);
 
-	    /* See if it failed */
 	    if(!$im){
-	        /* Create a black image */
 	        $im  = imagecreatetruecolor(150, 30);
 	        $bgc = imagecolorallocate($im, 255, 255, 255);
 	        $tc  = imagecolorallocate($im, 0, 0, 0);
 
 	        imagefilledrectangle($im, 0, 0, 150, 30, $bgc);
 
-	        /* Output an error message */
 	        imagestring($im, 1, 5, 5, 'Error loading ' . $imgFile, $tc);
 	    }
 	    return $im;
 	}
 
 	protected function createImageFromString($string){
-		/* Create a black image */
 	    $im  = imagecreatetruecolor(150, 30);
 	    $bgColor = imagecolorallocate($im, 255, 255, 255);
 	    $txtColor  = imagecolorallocate($im, 0, 0, 0);
@@ -121,8 +116,6 @@ class GDRender{
 
 	protected function createImageFromTF($string=''){
 		$params = $this->params;
-
-		echo json_encode($this->params);
 		$im = imagecreatetruecolor($params['image_width'], $params['image_height']);
 
 		$bg_color = imagecolorallocate($im, 255, 255, 255);
@@ -132,7 +125,6 @@ class GDRender{
 		$txt_color = imagecolorallocate($im, $color[0], $color[1], $color[2]);
 		imagefilledrectangle($im, 0, 0, $params['image_width'], $params['image_height'], $bg_color);
 
-		/** text to draw */
 		$text = $string;
 		$font_family = $params['text_fontfamily'];//imageloadfont("Vera.ttf");
 		$font_size = $params['text_fontsize'];
