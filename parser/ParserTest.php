@@ -27,25 +27,24 @@ $tokenMap = array(
 // rec parse
 $tokenMap = array(
 	'<p>',
-	'p_start_desc',
+	'p_start',
 	'<block>',
-	'block_start',
+	'block_info',
 	'<b>',
-	'u>u<LLLLL',
+	'bold>',
 	'</b>',
 	'block_end',
+	'</block>',	
+	'<block>',
+	'info2',
 	'</block>',
-	'p_end_desc',
-	/*'<block>',
-	'china',
-	'</block>',
-	'<un>',
+	'p_end',
+	/*'<un>',
 	'beijing',
 	'</un>',
 	'p_end',*/
-	'</p>'
+	'</p>',
 	);
 $parser = new ASTParser($str, $tokenMap);
 //print_r($tokenMap);
 $parser->astParse();
-
