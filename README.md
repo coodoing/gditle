@@ -19,6 +19,7 @@ Array ( [0] => <p> [1] => p_start [2] => <block> [3] => block_info [4] => <b> [5
 ```
 
 **parser**
+
 given the input tokenmap or the input string to get the ast.
 
 tokenmap
@@ -289,4 +290,7 @@ Array
 
 
 ```
+
+
+**Render**
 
