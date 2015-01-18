@@ -6,6 +6,7 @@ require_once 'ListRule.php';
 
 /** 
  * Base rule class which contains the basic rule provided 
+ *
  */
 class Rule{
 

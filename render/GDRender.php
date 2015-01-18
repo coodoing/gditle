@@ -1,6 +1,6 @@
 <?php
 
-class GDParser{
+class GDRender{
 	
 	/*
      * guid of the component

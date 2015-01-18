@@ -1,8 +1,8 @@
 <?php
 
-/*
- display format of paragraph
-*/
+/**
+ * Display rule of paragraph
+ */
 class ListRule{
 	
 	/*

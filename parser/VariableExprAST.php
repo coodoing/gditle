@@ -3,6 +3,10 @@
 require_once 'ExprAST.php';
 require_once '../ditle/DVariable.php';
 
+/**
+ * Variable Expression AST
+ *
+ */
 class VariableExprAST extends ExprAST{
 	
 	protected $varible;
@@ -14,5 +18,4 @@ class VariableExprAST extends ExprAST{
 	public function getVarible(){
 		return $this->varible;
 	}
-
 }

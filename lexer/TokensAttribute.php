@@ -26,7 +26,7 @@ class TokensAttribute{
 
 	/*
 	 * minmax order of token : p > block > b > i > un > __var__
-	 * sugg
+	 * default to set true
 	 */
 	public static $minmax = true;
 
@@ -37,6 +37,27 @@ class TokensAttribute{
 		'var'=>1,
 		'tag'=>2,
 		);
+
+	/**
+     * Matched open and closed quotes.
+     *
+     * @var array
+     */
+    public static $specialQuotes = array(
+        '"' => '"',
+        "'" => "'",
+        '(' => ')',
+        '{' => '}',
+        '[' => ']',
+        '«' => '»',
+        '»' => '«',
+        '‹' => '›',
+        '›' => '‹',
+        '„' => '“',
+        '‚' => '‘',
+        '‘' => '’',
+        '”' => '“',
+    );
 
 	/*
      * supported token symbols
@@ -67,9 +88,20 @@ class TokensAttribute{
 		);
 
 	/*
+	 * token full name
+	 */
+	public static $tokenUniversal = array(		
+		self::T_PARA_SYMBOL=>'paragraph',
+		self::T_BLOCK_SYMBOL=>'span',
+		self::T_BOLD_SYMBOL=>'bold',
+		self::T_ITALIC_SYMBOL=>'italic',
+		self::T_UNDERLINE_SYMBOL=>'underline',		
+		);
+
+	/*
 	 * token number,  0x01, 0x10, 0x20, ...
 	 */
-	public static $tokensNumber= array(
+	public static $tokensNumber = array(
 		self::T_PARA_START => '200',
 		self::T_PARA_END => '201',
 		self::T_BLOCK_START => '202',
@@ -147,4 +179,8 @@ class TokensAttribute{
 		self::T_UNDERLINE_START => self::T_UNDERLINE_SYMBOL,
 		self::T_UNDERLINE_END => self::T_UNDERLINE_SYMBOL,
 		);
+
+	public static function getSupportedTokens(){
+		return self::$tokenSymbols;
+	}
 }

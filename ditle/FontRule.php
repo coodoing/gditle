@@ -3,6 +3,9 @@
 require_once 'FontRule.php';
 require_once 'Config.php';
 
+/**
+ * Font rule of the varible or block
+ */
 class FontRule{
 	
 	private $fontName;
@@ -26,7 +29,8 @@ class FontRule{
 	private $fontUnderline;
 
 	public function __construct($font = array()){
-		if(!empty($defaultChar)){
+		if(!empty($font)){
+			global $defaultChar;
 			$this->fontColor = $defaultChar['fontColor'];
 			$this->fontSize = $defaultChar['fontSize'];
 			$this->fontAngle = $defaultChar['fontAngle'];

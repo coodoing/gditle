@@ -22,11 +22,18 @@ class ASTParser{
 
 	/**
 	 * parse method used in the class
-	 * 0: regular parsing
-	 * 1: Binary expression : operator-precedence parser 
+	 * 0: regular parse method
+	 * 1: Binary expression by operator-precedence parser 
 	 * suggested setting 0
 	 */
 	protected $parseMethod ; 
+
+	/**
+	 * combinate the variable use the block or the array
+	 * 0 : array
+	 * 1 : block
+	 */
+	protected $varBlock;
 	
 	/*
 	 * input string
@@ -42,9 +49,10 @@ class ASTParser{
 		$this->inArray = $inArray;
 
 		$this->parseMethod = 0;
+		$this->varBlock = 1;
 	}
 
-	/*
+	/**
 	 * operator-precedence parser 
 	 */
 	public function astParse(){
@@ -210,8 +218,12 @@ class ASTParser{
 							}
 						}
 
-						$combinationExpr = new BlockExprAST($_lhsExpr, $binary['expr'], $_rhsExpr);
-						$combinationExpr = array($_lhsExpr, $binary['expr'], $_rhsExpr);
+						if($this->varBlock == 1){
+							$combinationExpr = new BlockExprAST($_lhsExpr, $binary['expr'], $_rhsExpr);	
+						}
+						else{
+							$combinationExpr = array($_lhsExpr, $binary['expr'], $_rhsExpr);
+						}
 						/** final process */
 						if(empty($_lhsExpr) && empty($_rhsExpr)){
 							$combinationExpr = $binary['expr'];
@@ -372,6 +384,6 @@ class ASTParser{
 	 * Cache the AST of the input string or array
 	 */
 	protected function cache(){
-
+		//TODO
 	}
 }
