@@ -296,13 +296,14 @@ class DOMParser{
 	 *
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/Reference
 	 * http://www.w3.org/TR/css3-selectors/
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors
 	 *
 	 *Basic Selectors:
 	 *	Type selectors elementname       p
 	 *	Class selectors .classname       p.class
 	 *	ID selectors #idname             p#id
 	 *	Universal selectors * ns|* *|*   *[lang^=en]
-	 *	Attribute selectors              [attr=value]
+	 *	Attribute selectors  (?:([~|!*^$]?=)[\"']?(.*?)[\"']?)   [attr=value][attr~=value][attr|=value][attr^=value][attr$=value][attr*=value]
 	 *
 	 * #TODO
 	 *  Combinators:
@@ -315,7 +316,7 @@ class DOMParser{
 	public function parseSelectors($selector){
 		
 		// pattern of CSS selectors, modified from mootools
-		$pattern = "/([\w-:\*]*)(?:\#([\w-]+)|\.([\w-]+))?(?:\[@?(!?[\w-:]+)(?:([!*^$]?=)[\"']?(.*?)[\"']?)?\])?([\/, ]+)/is";
+		$pattern = "/([\w-:\*]*)(?:\#([\w-]+)|\.([\w-]+))?(?:\[@?(!?[\w-:]+)(?:([~|!*^$]?=)[\"']?(.*?)[\"']?)?\])?([\/, ]+)/is";
 		preg_match_all($pattern, trim($selector).' ', $matches, PREG_SET_ORDER);
 
 		$selectors = array ();
