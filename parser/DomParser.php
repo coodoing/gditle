@@ -30,10 +30,16 @@ class DOMParser{
 	protected $visited = array();
 
 	/**
-	 * tidynode array
-	 * finded selector array
+	 * tidynode nodes Map
+	 * finded node map
 	 */
-	protected $finded = array();
+	protected $allNodesMap = array();
+
+	/**
+	 * tidynode map
+	 * finded node map
+	 */
+	protected $findedNodesMap = array();
 
 	public function __construct($string){
 
@@ -49,36 +55,64 @@ class DOMParser{
 	}
 
 	public function __destruct(){
-
+		//TODO
 	}
 
 	public function getDom(){
 		return $this->dom;
 	}
 
-	public function find($selector, $idx = 0){
+	public function find($selectorString, $idx = 0){
+
+		$selectors = $this->parseSelectors($selectorString);
 		if($this->traverse == 0){
 			//$this->dfsTraverse($this->dom);
-			$this->bfsTraverse($this->dom);
-			$this->dfsFind($selector, $this->dom, $idx);
+			$this->dfsFind($selectors, $this->dom, $idx);
+			//print_r($this->allNodesMap);
 		}else{
-			$this->bfsTraverse($this->dom);
-			$this->bfsFind($selector, $this->dom, $idx);
+			//$this->bfsTraverse($this->dom);
+			$this->bfsFind($selectors, $this->dom, $idx);
 		}
 	}
 
 	/**
 	 * DFS find
 	 */
-	protected function dfsFind($selector, $node, $idx = 0){
+	protected function dfsFind($selectors, $node, $idx){
 
+		$this->setVisited($node);
+		if(!empty($node->child)){
+			foreach($node->child as $_current){
+				/**tidyNode*/
+				if(!$this->isVisited($_current)){
+					$this->dfsFind($selectors, $_current, $idx);
+					$md5_node = $this->md5Node($_current);
+					$this->allNodesMap[$md5_node] = $_current;			
+					//echo $_current->value . "\n";		
+					$this->searchNodeSelector($selectors, $_current, $idx);
+				}
+			}
+		}		
+		//echo $node->value . "\n";
+	}
 
+	protected function searchNodeSelector($selectors, $_current, $idx){
+		foreach($selectors as $key => $val){
+
+		}
+	}
+
+	/**
+	 * string match function
+	 */
+	protected function stringMatch($str1, $str2){
+		//TODO
 	}
 
 	/**
 	 * BFS find
 	 */
-	protected function bfsFind($selector, $node, $idx = 0){
+	protected function bfsFind($selector, $node, $idx){
 		//TODO
 
 	}
@@ -102,11 +136,10 @@ class DOMParser{
 				if(!$this->isVisited($_current)){
 					$this->dfsTraverse($_current);
 					echo $_current->value."\n";
-				}else{
-					//echo $_current->value."\n";
 				}
 			}
 		}
+		//echo $_current->value."\n";
 	}
 
 	/**
@@ -118,8 +151,6 @@ class DOMParser{
 
 		$queue = array();
 		$this->setVisited($node);
-		//$sets = array();
-		//array_push($sets, $node);
 		/**be careful about the queue structure*/
 		array_unshift($queue, $node); 
 		while(!empty($queue)){
@@ -138,6 +169,20 @@ class DOMParser{
 
 	}
 
+	/**
+	 * get tidynody object from the md5 hash
+	 */
+	protected function getTidyNodeByMd5Hash($node){
+		$md5_node = $this->md5Node($node);
+		if(!empty($this->allNodesMap)){
+			return $this->allNodesMap[$md5_node];
+		}
+		return null;
+	}
+
+	/**
+	 * md5 hash the node object
+	 */
 	protected function md5Node($node){
 		//md5(serialize($node->value));
 		return md5(serialize($node));
@@ -160,10 +205,10 @@ class DOMParser{
 
 	public function getElementByName($name){
 
-		//echo $this->dom->name ;
 		if($this->dom->name == $name){
 			return $this->dom->value;			
 		}else{
+
 		}
 	}
 
@@ -181,7 +226,7 @@ class DOMParser{
 
 		$this->dom = $this->postParse();
 
-		print_r($this->dom);
+		//print_r($this->dom);
 		return $this->dom;		
 	}
 
@@ -208,7 +253,7 @@ class DOMParser{
 	 * get attribute of the 
 	 */
 	public function getAttributeByName($name, $idx = 0){
-		//echo json_encode($this->isVisited($this->dom));
+
 		//print_r($this->isVisited($this->dom[0]));
 		if(isset($this->dom->name)){
 			return $this->dom->value;
