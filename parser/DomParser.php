@@ -17,7 +17,7 @@ class DOMParser{
 
 	public function __construct($string){
 
-		if(function_exists('tidy_parse_string')){
+		if(!function_exists('tidy_parse_string')){
 			exit('tidy module not exist');
 		}else{
 			$this->dom = $this->parse($string);
@@ -40,11 +40,24 @@ class DOMParser{
 	 * use tidy to parse string 
 	 */
 	public function parse($string){
-		$string = $this->tidify($string);
+		$string = $this->preParse($string);
 
 		$tidy = new tidy();
 		$tidy->parseString($string, array(), 'utf8');
-		$this->dom = $tidy->html();
+		$this->dom = $tidy->body();
+
+		$this->dom = $this->postParse($this->dom);
+
+		print_r($this->dom);
+	}
+
+	protected function preParse($string){
+		$string = $this->tidify($string);
+		return $string;
+	}
+
+	protected function postParse($dom){
+		return $dom;
 	}
 
 	/**
