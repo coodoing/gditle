@@ -2,6 +2,7 @@
 
 /**
   * common token attribute as priority, number , etc
+  * http://php.net/manual/zh/tidy.constants.php
   */
 class TokensAttribute{	
 	

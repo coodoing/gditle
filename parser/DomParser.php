@@ -89,7 +89,7 @@ class DOMParser{
 					$md5_node = $this->md5Node($_current);
 					$this->allNodesMap[$md5_node] = $_current;			
 					//echo $_current->value . "\n";		
-					$this->searchNodeSelector($selectors, $_current, $idx);
+					$this->searchNodeSelector($selectors, $_current);
 				}
 			}
 		}		
@@ -104,17 +104,88 @@ class DOMParser{
 
 	}
 
-	protected function searchNodeSelector($selectors, $_current, $idx){
+	protected function searchNodeSelector($selectors, $_current){
 		foreach($selectors as $key => $val){
 			$selector = $selectors[$key];
 
+			$this->singleSearch($selector, $_current);
+		}
+	}
+	
+	protected function singleSearch(array $selector, tidyNode $node){
+		list ( $tag, $key, $val, $exp, $no_key ) = $selector; 
 
+		$pass = true;
+		if ($tag == '*' && !$key) {
+			exit('selector error ');
+		}
+		if ($tag && $tag != $node->name && $tag !== '*') {
+			$pass = false;
+		}
+		if ($pass && $key) {
+			if ($no_key) {
+				if (isset ( $node->attribute [$key] )) {
+					$pass = false;
+				}
+			} else {
+				if ($key != "plaintext" && ! isset ( $node->attribute [$key] )) {
+					$pass = false;
+				}
+			}
+		}
+		if ($pass && $key && $val && $val != '*') {
+			if ($key == "plaintext") {
+				$nodeKeyValue = $this->text ($node);
+			} else {
+				$nodeKeyValue = $node->attribute [$key];
+			}
+			$check = $this->match ( $exp, $val, $nodeKeyValue );
+			if (! $check && strcasecmp ( $key, 'class' ) == 0) {
+				foreach ( explode ( ' ', $node->attribute [$key] ) as $k ) {
+					if (! empty ( $k )) {
+						$check = $this->match ( $exp, $val, $k );
+						if ($check) {
+							break;
+						}
+					}
+				}
+			}
+			if (! $check) {
+				$pass = false;
+			}
+		}
+		if ($pass) {
+			//if($this->singleSearch ( $this->getParent($node), $selector)) {
+			return $node;
+			//} else {
+			//	return false;
+			//}
+		} else {
+			return false;
+		}
+	}
 
+	public function getNodeText($name){
+
+		if(!empty($node)){
+			return $node->value;			
 		}
 	}
 
 	/**
-	 * parse the tidy node's attribute
+	 * get attribute of the node
+	 */
+	public function getNodeAttribute($node){
+
+		if(!empty($node)){
+			return $node->attribute;
+		}
+	}
+
+	/**
+	 * Parse the tidy node's attribute to specified Selector structure
+	 * https://github.com/sabberworm/PHP-CSS-Parser/blob/master/lib/Sabberworm/CSS/Parser.php
+	 *
 	 */
 	protected function parseNodeAttribute($node){
 		if(!empty($node)){
@@ -123,15 +194,6 @@ class DOMParser{
 			$attribute = $node->attribute;
 			return $attribute;
 		}
-	}
-
-	/**
-	 * string match function 
-	 * test if str1 is the substr of str2 or not
-	 */
-	protected function stringMatch($str1, $str2){
-		//TODO
-
 	}
 
 	/**
@@ -183,6 +245,15 @@ class DOMParser{
 				}
 			}
 		}
+
+	}
+
+	/**
+	 * string match function 
+	 * test if str1 is the substr of str2 or not
+	 */
+	protected function stringMatch($str1, $str2){
+		//TODO
 
 	}
 
@@ -255,23 +326,6 @@ class DOMParser{
 			//return $dom->child;
 		}
 		return $dom;
-	}
-
-	/**
-	 * get attribute of the 
-	 */
-	public function getAttributeByName($name, $idx = 0){
-
-		if(isset($this->dom->name)){
-			return $this->dom->attribute;
-		}
-	}
-
-	public function getElementByName($name){
-
-		if($this->dom->name == $name){
-			return $this->dom->value;			
-		}
 	}
 
 	/**
