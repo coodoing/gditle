@@ -96,23 +96,40 @@ class DOMParser{
 		//echo $node->value . "\n";
 	}
 
+	/**
+	 * BFS find
+	 */
+	protected function bfsFind($selector, $node, $idx){
+		//TODO
+
+	}
+
 	protected function searchNodeSelector($selectors, $_current, $idx){
 		foreach($selectors as $key => $val){
+			$selector = $selectors[$key];
+
+
 
 		}
 	}
 
 	/**
-	 * string match function
+	 * parse the tidy node's attribute
 	 */
-	protected function stringMatch($str1, $str2){
-		//TODO
+	protected function parseNodeAttribute($node){
+		if(!empty($node)){
+
+			// TODO 
+			$attribute = $node->attribute;
+			return $attribute;
+		}
 	}
 
 	/**
-	 * BFS find
+	 * string match function 
+	 * test if str1 is the substr of str2 or not
 	 */
-	protected function bfsFind($selector, $node, $idx){
+	protected function stringMatch($str1, $str2){
 		//TODO
 
 	}
@@ -172,7 +189,7 @@ class DOMParser{
 	/**
 	 * get tidynody object from the md5 hash
 	 */
-	protected function getTidyNodeByMd5Hash($node){
+	protected function getNodeByMd5Hash($node){
 		$md5_node = $this->md5Node($node);
 		if(!empty($this->allNodesMap)){
 			return $this->allNodesMap[$md5_node];
@@ -201,15 +218,6 @@ class DOMParser{
 		$node_key = md5(serialize($node));
 		//$node_key = md5(serialize($node->value));
 		$this->visited[$node_key] = true;
-	}
-
-	public function getElementByName($name){
-
-		if($this->dom->name == $name){
-			return $this->dom->value;			
-		}else{
-
-		}
 	}
 
 	/**
@@ -254,9 +262,15 @@ class DOMParser{
 	 */
 	public function getAttributeByName($name, $idx = 0){
 
-		//print_r($this->isVisited($this->dom[0]));
 		if(isset($this->dom->name)){
-			return $this->dom->value;
+			return $this->dom->attribute;
+		}
+	}
+
+	public function getElementByName($name){
+
+		if($this->dom->name == $name){
+			return $this->dom->value;			
 		}
 	}
 
@@ -279,7 +293,9 @@ class DOMParser{
 
 	/**
 	 * parse the selectors, same as simple_html_dom.php
+	 *
 	 * https://developer.mozilla.org/en-US/docs/Web/CSS/Reference
+	 * http://www.w3.org/TR/css3-selectors/
 	 *
 	 *Basic Selectors:
 	 *	Type selectors elementname       p

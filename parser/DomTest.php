@@ -2,16 +2,15 @@
 
 require_once 'DOMParser.php';
 
-//$str = '<p class="blank">test<span>mmm</span>block</p> <p> second </p>';
 $str = '<p class="blanket" id="p++">start<span lang="en">mmm</span>end</p>';
 $selector = 'p.blanket span';
 
 $parser = new DOMParser($str);
 //$selector = $parser->parseSelectors('p#blank p');
-//$selector = $parser->parseSelectors('span[lang="jp"]');
+$selector = $parser->parseSelectors('span[lang="en"]');
 //$selector = $parser->parseSelectors('p+span[lang="en"]');
 //$selector = $parser->parseSelectors('a[href], ul[class]');
 
-$selector = $parser->parseSelectors($selector);
+//$selector = $parser->parseSelectors($selector);
 
-$parser->find('');
+$parser->find($selector);
