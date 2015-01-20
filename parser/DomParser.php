@@ -1,8 +1,5 @@
 <?php
 
-use tidyNode;
-use tidy;
-
 class DOMParser{
 	
 	/**
@@ -15,49 +12,139 @@ class DOMParser{
 	 */
 	protected $dom;
 
+	/**
+	 * raw input 
+	 */
+	protected $rawIn;
+
+	/**
+	 * traverse method
+	 * 0 : dfs
+	 * 1 : bfs
+	 */
+	protected $traverse;
+
+	/**
+	 * visited or not
+	 */
+	protected $visited = array();
+
 	public function __construct($string){
 
+		$this->rawIn = $string;
 		if(!function_exists('tidy_parse_string')){
 			exit('tidy module not exist');
 		}else{
-			$this->dom = $this->parse($string);
-		}
+			//$this->dom = $this->parse();
+			$this->parse();
+		} 
+
+		$this->traverse = 0;
 	}
 
 	public function __destruct(){
 
 	}
 
-	public function find(){
+
+	public function find($selector){
+		if($this->traverse == 0){
+			$this->dfsFind($selector);
+		}else{
+			$this->bfsFind($selector);
+		}
+	}
+
+	/**
+	 * 1  procedure DFS(G,v):
+	 * 2      label v as discovered
+	 * 3      for all edges from v to w in G.adjacentEdges(v) do
+	 * 4          if vertex w is not labeled as discovered then
+	 * 5              recursively call DFS(G,w)
+	 */
+	protected function dfsFind($selector){
+		$dom = $this->dom;
+
+
+
 
 	}
 
-	public function getElement(){
-		
+	protected function isVisited($node){
+		/**make the node's key */
+		$node_key = md5(serialize($node));
+		if(isset($this->visited[$node_key])){
+			return $this->visited[$node_key];
+		}
+		return false;
+	}
+
+	protected function visited($node){
+		$node_key = md5(serialize($node));
+		$this->visited[$node_key] = true;
+	}
+
+	protected function bfsFind($selector){
+		//TODO
+	}
+
+	public function getElementByName($name){
+
+		echo $this->dom->name ;
+		if($this->dom->name == $name){
+			return $this->dom->value;			
+		}else{
+		}
 	}
 
 	/**
 	 * use tidy to parse string 
 	 */
-	public function parse($string){
-		$string = $this->preParse($string);
+	public function parse(){
+
+		$this->dom = $this->preParse();
 
 		$tidy = new tidy();
-		$tidy->parseString($string, array(), 'utf8');
+		/**doesn't support user-defined tags such as <block> <un>*/
+		$tidy->parseString($this->dom, array(), 'utf8');
 		$this->dom = $tidy->body();
 
-		$this->dom = $this->postParse($this->dom);
+		$this->dom = $this->postParse();
 
 		print_r($this->dom);
+		return $this->dom;		
 	}
 
-	protected function preParse($string){
-		$string = $this->tidify($string);
+	/**
+	 * tidify the input dom string
+	 */
+	protected function preParse(){
+		$string = $this->tidify($this->rawIn);
 		return $string;
 	}
 
-	protected function postParse($dom){
+	/**
+	 * only return the content of tidyNode without html/body tag
+	 */
+	protected function postParse(){
+		$dom = $this->dom;
+		if(!empty($dom->child)){
+			return $dom->child;
+		}
 		return $dom;
+	}
+
+	/**
+	 * get attribute of the 
+	 */
+	public function getAttributeByName($name, $idx = 0){
+		//$ret = '';
+		echo json_encode($this->isVisited($this->dom));
+		//print_r($this->isVisited($this->dom[0]));
+
+		if(isset($this->dom->name)){
+			return $this->dom->value;
+		}
 	}
 
 	/**
@@ -78,10 +165,25 @@ class DOMParser{
 	}
 
 	/**
-	 * parse the selectors
-	 * same as simple_html_dom.php
+	 * parse the selectors, same as simple_html_dom.php
+	 * https://developer.mozilla.org/en-US/docs/Web/CSS/Reference
+	 *
+	 *Basic Selectors:
+	 *	Type selectors elementname       p
+	 *	Class selectors .classname       p.class
+	 *	ID selectors #idname             p#id
+	 *	Universal selectors * ns|* *|*   *[lang^=en]
+	 *	Attribute selectors              [attr=value]
+	 *
+	 * #TODO
+	 *  Combinators:
+	 *	Adjacent sibling selectors A + B
+	 *	General sibling selectors A ~ B
+	 *	Child selectors A > B
+	 *	Descendant selectors A Basic
+	 *
 	 */
-	protected function parseSelectors($selector){
+	public function parseSelectors($selector){
 		
 		// pattern of CSS selectors, modified from mootools
 		$pattern = "/([\w-:\*]*)(?:\#([\w-]+)|\.([\w-]+))?(?:\[@?(!?[\w-:]+)(?:([!*^$]?=)[\"']?(.*?)[\"']?)?\])?([\/, ]+)/is";
@@ -90,7 +192,7 @@ class DOMParser{
 		$selectors = array ();
 		$result = array ();
 
-		var_dump($matches);
+		//print_r($matches);
 
 		foreach ( $matches as $m ) {
 			$m [0] = trim ( $m [0] );
@@ -133,6 +235,8 @@ class DOMParser{
 		if (count ( $result ) > 0){
 			$selectors [] = $result;
 		}
+
+		//print_r($selectors);
 		return $selectors;
 	}
 }
