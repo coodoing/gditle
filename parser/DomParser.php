@@ -25,9 +25,15 @@ class DOMParser{
 	protected $traverse;
 
 	/**
-	 * visited or not
+	 * tidynode visited or not
 	 */
 	protected $visited = array();
+
+	/**
+	 * tidynode array
+	 * finded selector array
+	 */
+	protected $finded = array();
 
 	public function __construct($string){
 
@@ -46,28 +52,95 @@ class DOMParser{
 
 	}
 
+	public function getDom(){
+		return $this->dom;
+	}
 
-	public function find($selector){
+	public function find($selector, $idx = 0){
 		if($this->traverse == 0){
-			$this->dfsFind($selector);
+			//$this->dfsTraverse($this->dom);
+			$this->bfsTraverse($this->dom);
+			$this->dfsFind($selector, $this->dom, $idx);
 		}else{
-			$this->bfsFind($selector);
+			$this->bfsTraverse($this->dom);
+			$this->bfsFind($selector, $this->dom, $idx);
 		}
 	}
 
 	/**
+	 * DFS find
+	 */
+	protected function dfsFind($selector, $node, $idx = 0){
+
+
+	}
+
+	/**
+	 * BFS find
+	 */
+	protected function bfsFind($selector, $node, $idx = 0){
+		//TODO
+
+	}
+
+	/**
+	 * dfs traverse
+	 * http://en.wikipedia.org/wiki/Depth-first_search
+	 *
 	 * 1  procedure DFS(G,v):
 	 * 2      label v as discovered
 	 * 3      for all edges from v to w in G.adjacentEdges(v) do
 	 * 4          if vertex w is not labeled as discovered then
 	 * 5              recursively call DFS(G,w)
+	 *
 	 */
-	protected function dfsFind($selector){
-		$dom = $this->dom;
+	protected function dfsTraverse($node){
+		$this->setVisited($node);
+		if(!empty($node->child)){
+			foreach($node->child as $_current){
+				/**tidyNode*/
+				if(!$this->isVisited($_current)){
+					$this->dfsTraverse($_current);
+					echo $_current->value."\n";
+				}else{
+					//echo $_current->value."\n";
+				}
+			}
+		}
+	}
 
+	/**
+	 * bfs traverse
+	 * http://en.wikipedia.org/wiki/Breadth-first_search
+	 *
+	 */
+	protected function bfsTraverse($node){		
 
+		$queue = array();
+		$this->setVisited($node);
+		//$sets = array();
+		//array_push($sets, $node);
+		/**be careful about the queue structure*/
+		array_unshift($queue, $node); 
+		while(!empty($queue)){
+			$pop_node = array_pop($queue);
+			echo $pop_node->value."\n";
 
+			if(!empty($pop_node->child)){
+				foreach($pop_node->child as $_current){
+					if(!$this->isVisited($_current)){
+						$this->setVisited($_current);
+						array_unshift($queue, $_current);
+					}
+				}
+			}
+		}
 
+	}
+
+	protected function md5Node($node){
+		//md5(serialize($node->value));
+		return md5(serialize($node));
 	}
 
 	protected function isVisited($node){
@@ -79,18 +152,15 @@ class DOMParser{
 		return false;
 	}
 
-	protected function visited($node){
+	protected function setVisited($node){
 		$node_key = md5(serialize($node));
+		//$node_key = md5(serialize($node->value));
 		$this->visited[$node_key] = true;
-	}
-
-	protected function bfsFind($selector){
-		//TODO
 	}
 
 	public function getElementByName($name){
 
-		echo $this->dom->name ;
+		//echo $this->dom->name ;
 		if($this->dom->name == $name){
 			return $this->dom->value;			
 		}else{
@@ -129,7 +199,7 @@ class DOMParser{
 	protected function postParse(){
 		$dom = $this->dom;
 		if(!empty($dom->child)){
-			return $dom->child;
+			//return $dom->child;
 		}
 		return $dom;
 	}
@@ -138,10 +208,8 @@ class DOMParser{
 	 * get attribute of the 
 	 */
 	public function getAttributeByName($name, $idx = 0){
-		//$ret = '';
-		echo json_encode($this->isVisited($this->dom));
+		//echo json_encode($this->isVisited($this->dom));
 		//print_r($this->isVisited($this->dom[0]));
-
 		if(isset($this->dom->name)){
 			return $this->dom->value;
 		}
@@ -236,7 +304,7 @@ class DOMParser{
 			$selectors [] = $result;
 		}
 
-		//print_r($selectors);
+		print_r($selectors);
 		return $selectors;
 	}
 }
