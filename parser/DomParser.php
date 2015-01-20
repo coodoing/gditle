@@ -47,7 +47,6 @@ class DOMParser{
 		if(!function_exists('tidy_parse_string')){
 			exit('tidy module not exist');
 		}else{
-			//$this->dom = $this->parse();
 			$this->parse();
 		} 
 
@@ -68,7 +67,6 @@ class DOMParser{
 		if($this->traverse == 0){
 			//$this->dfsTraverse($this->dom);
 			$this->dfsFind($selectors, $this->dom, $idx);
-			//print_r($this->allNodesMap);
 		}else{
 			//$this->bfsTraverse($this->dom);
 			$this->bfsFind($selectors, $this->dom, $idx);
@@ -89,10 +87,17 @@ class DOMParser{
 					$md5_node = $this->md5Node($_current);
 					$this->allNodesMap[$md5_node] = $_current;			
 					//echo $_current->value . "\n";		
-					$this->searchNodeSelector($selectors, $_current);
+					$this->searchNodeBySelector($selectors, $_current);
 				}
 			}
-		}		
+		}
+		if(empty($this->findedNodesMap)){
+			return null;
+		}else{
+			foreach($this->findedNodesMap as $key=>$val){
+				echo $val->value;
+			}
+		}
 		//echo $node->value . "\n";
 	}
 
@@ -101,27 +106,43 @@ class DOMParser{
 	 */
 	protected function bfsFind($selector, $node, $idx){
 		//TODO
-
 	}
 
-	protected function searchNodeSelector($selectors, $_current){
+	protected function searchNodeBySelector($selectors, $node){
 		foreach($selectors as $key => $val){
 			$selector = $selectors[$key];
 
-			$this->singleSearch($selector, $_current);
+			if(!empty($selector)){
+				foreach($selector as $_selector){					
+					$ret = $this->searchNode($_selector, $node);
+					//print_r(json_encode($ret)."\n");
+
+					if($ret == false){
+						break;
+					}else{
+						$md5_node = $this->md5Node($node);
+						$this->findedNodesMap[$md5_node] = $node;
+					}
+				}
+			}			
 		}
 	}
 	
-	protected function singleSearch(array $selector, tidyNode $node){
+	/**
+	 * search node
+	 */
+	protected function searchNode(array $selector, tidyNode $node){
 		list ( $tag, $key, $val, $exp, $no_key ) = $selector; 
 
 		$pass = true;
 		if ($tag == '*' && !$key) {
-			exit('selector error ');
+			exit('selector style error ');
 		}
+
 		if ($tag && $tag != $node->name && $tag !== '*') {
 			$pass = false;
 		}
+
 		if ($pass && $key) {
 			if ($no_key) {
 				if (isset ( $node->attribute [$key] )) {
@@ -133,40 +154,36 @@ class DOMParser{
 				}
 			}
 		}
+
 		if ($pass && $key && $val && $val != '*') {
 			if ($key == "plaintext") {
-				$nodeKeyValue = $this->text ($node);
+				$node_value = $this->getNodeText($node);
 			} else {
-				$nodeKeyValue = $node->attribute [$key];
+				$node_value = $node->attribute[$key];
 			}
-			$check = $this->match ( $exp, $val, $nodeKeyValue );
-			if (! $check && strcasecmp ( $key, 'class' ) == 0) {
+			$match = $this->attributeMatch( $exp, $val, $node_value );
+			if (! $match && strcasecmp ( $key, 'class' ) == 0) {
 				foreach ( explode ( ' ', $node->attribute [$key] ) as $k ) {
 					if (! empty ( $k )) {
-						$check = $this->match ( $exp, $val, $k );
-						if ($check) {
+						$match = $this->attributeMatch ( $exp, $val, $k );
+						if ($match) {
 							break;
 						}
 					}
 				}
 			}
-			if (! $check) {
+			if (! $match) {
 				$pass = false;
 			}
 		}
 		if ($pass) {
-			//if($this->singleSearch ( $this->getParent($node), $selector)) {
 			return $node;
-			//} else {
-			//	return false;
-			//}
 		} else {
 			return false;
 		}
 	}
 
 	public function getNodeText($name){
-
 		if(!empty($node)){
 			return $node->value;			
 		}
@@ -176,7 +193,6 @@ class DOMParser{
 	 * get attribute of the node
 	 */
 	public function getNodeAttribute($node){
-
 		if(!empty($node)){
 			return $node->attribute;
 		}
@@ -189,7 +205,6 @@ class DOMParser{
 	 */
 	protected function parseNodeAttribute($node){
 		if(!empty($node)){
-
 			// TODO 
 			$attribute = $node->attribute;
 			return $attribute;
@@ -345,6 +360,42 @@ class DOMParser{
         return $string;
 	}
 
+	protected function attributeMatch($exp, $pattern, $node_value) {
+		$pattern = strtolower($pattern);
+		$node_value = strtolower($node_value);
+
+		switch ($exp) {
+			case '=' :
+				return ($node_value === $pattern);
+			case "~=":
+				$node_array = explode(" ", $node_value);
+				if(in_array($pattern, $node_array)){
+					return true;
+				}else{
+					return false;
+				}
+			case "|=":
+				//return preg_match ( "/" . preg_quote ( $pattern, '/' ) . '(-)' . "/", $node_value );;
+				if($pattern === $node_value || preg_match("/^$pattern\-/", $node_value)){
+					return true;
+				}else{
+					return false;
+				}
+			case '!=' :
+				return ($node_value !== $pattern);
+			case '^=' :
+				return preg_match ( "/^" . preg_quote ( $pattern, '/' ) . "/", $node_value );
+			case '$=' :
+				return preg_match ( "/" . preg_quote ( $pattern, '/' ) . "$/", $node_value );
+			case '*=' :
+				if ($pattern [0] == '/') {
+					return preg_match ( $pattern, $node_value );
+				}
+				return preg_match ( "/" . $pattern . "/i", $node_value );
+		}
+		return false;
+	}
+
 	/**
 	 * parse the selectors, same as simple_html_dom.php
 	 *
@@ -375,7 +426,6 @@ class DOMParser{
 
 		$selectors = array ();
 		$result = array ();
-
 		//print_r($matches);
 
 		foreach ( $matches as $m ) {
