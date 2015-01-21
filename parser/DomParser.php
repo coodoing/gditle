@@ -41,6 +41,11 @@ class DOMParser{
 	 */
 	protected $findedNodesMap = array();
 
+	/**
+	 * node's level map
+	 */
+	protected $levelNodeMap = array();
+
 	public function __construct($string){
 
 		$this->rawIn = $string;
@@ -49,16 +54,22 @@ class DOMParser{
 		}else{
 			$this->parse();
 		} 
+		print_r($this->getLevelKChildNodes($this->dom, 2));
 
 		$this->traverse = 0;
 	}
 
 	public function __destruct(){
 		//TODO
+		$this->clearDom();
 	}
 
 	public function getDom(){
 		return $this->dom;
+	}
+
+	protected function clearDom(){
+
 	}
 
 	public function find($selectorString, $idx = 0){
@@ -134,6 +145,15 @@ class DOMParser{
 		}
 	}
 
+	/**
+	 * search node by the specified array selector
+	 *  more efficient by the level search.
+	 * 
+	 *  selector[0]					node
+	 *  selector[1]			node_1   	  node_1
+	 *  selector[2]	   node_2  node_2   node_2   node_2
+	 *  ...			   ...
+	 */
 	protected function searchNodeBySelector($selector, $node){
 		if(!empty($selector)){
 			$flag = true;
@@ -142,25 +162,57 @@ class DOMParser{
 			//foreach($selector as $_selector){	
 			for($i=0; $i < count($selector); $i++){
 				/**capitable with the selector structure*/				
-				$ret = $this->searchNode($selector[$i], $currrent_node);
+				$ret = $this->searchNode($selector, $currrent_node);
 				//print_r(json_encode($ret)."\n");
+
 				if($ret == false){
 					$flag = false;
 					break;
 				}else{
+					/*if(!empty($currrent_node)){
+						$child_node = $currrent_node->child;
+						foreach ($child_node as $k => $v) {
+							echo 'xx';
+							if(!empty($v->attribute)){
+								$this->searchNode($selector[$i], $v);
+							}
+							
+						}
+					}*/
 					continue;
 				}
-				if(!empty($currrent_node)){
-					$child_node = $currrent_node->child;
-					foreach ($child_node as $k => $v) {
-						$this->searchNodeBySelector($selector[$i], $v);
-					}
-				}
+				
 			}
 			return $flag;				
 		}
 	}
-	
+
+	/**
+	 * get the level-k's child nodes
+	 * 
+	 *       0					node
+	 *       1			node_1   	  node_1
+	 *  	 2	   node_2  node_2   node_2   node_2
+	 *  ...			   ...
+	 */
+	protected function getLevelKChildNodes($node, $levelK){
+			
+			foreach($node->child as $val){				
+				$this->getLevelKChildNodes($val);
+				echo $val->value."\n";				
+			}
+
+			$child_node = array();
+			if(!empty($node)){
+				foreach($node->child as $val){
+					$_child_node = $this->getLevelKChildNodes($val, $levelK-1);
+					$child_node[] = $_child_node;
+				}
+			}			
+		}
+		
+	}
+
 	/**
 	 * search node by the selector
 	 */
@@ -344,7 +396,7 @@ class DOMParser{
 
 		$this->dom = $this->postParse();
 
-		//print_r($this->dom);
+		print_r($this->dom);
 		return $this->dom;		
 	}
 
