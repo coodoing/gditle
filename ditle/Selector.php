@@ -12,4 +12,12 @@ abstract class Selector{
 
 	protected $expr;
 
+	protected $rawIn;
+
+	public function __construct(){
+
+	}
+
+	
+
 }

@@ -30,13 +30,11 @@ class DOMParser{
 	protected $visited = array();
 
 	/**
-	 * tidynode nodes Map
-	 * finded node map
+	 * global all node map 
 	 */
 	protected $allNodesMap = array();
 
 	/**
-	 * tidynode map
 	 * finded node map
 	 */
 	protected $findedNodesMap = array();
@@ -44,63 +42,60 @@ class DOMParser{
 	/**
 	 * node's level map
 	 */
-	protected $levelNodeMap = array();
+	protected $levelNodesMap = array();
 
 	public function __construct($string){
 
 		$this->rawIn = $string;
+		$this->traverse = 0;
+
 		if(!function_exists('tidy_parse_string')){
 			exit('tidy module not exist');
 		}else{
 			$this->parse();
 		} 
-		print_r($this->getLevelKChildNodes($this->dom, 2));
-
-		$this->traverse = 0;
+		($this->getLevelKChildNodes($this->dom, 1));
+		print_r($this->levelNodesMap);		
 	}
 
 	public function __destruct(){
 		//TODO
-		$this->clearDom();
+		$this->cleanDom($this->dom);
 	}
 
-	public function getDom(){
+	protected function getDom(){
 		return $this->dom;
 	}
 
-	protected function clearDom(){
+	protected function restore(){
+		$this->levelNodesMap = array();
+		$this->findedNodesMap = array();
+	}
 
+	protected function cleanDom($node){
+		$root = $node;
+		if(!empty($root->child)) {
+			foreach($root->child as $child) {
+				$this->cleanDom($child);
+			}
+		}
+		unset($node);
 	}
 
 	public function find($selectorString, $idx = 0){
 
+		$this->restore();
+
 		$selectors = $this->parseSelectors($selectorString);
 		if($this->traverse == 0){
 			//$this->dfsTraverse($this->dom);
-			$this->dfsFind($selectors, $this->dom, $idx);
+			$this->dfsFind($selectors, $this->dom);
 		}else{
 			//$this->bfsTraverse($this->dom);
-			$this->bfsFind($selectors, $this->dom, $idx);
+			$this->bfsFind($selectors, $this->dom);
 		}
-	}
 
-	/**
-	 * DFS find
-	 */
-	protected function dfsFind($selectors, $node, $idx){
-		$this->setVisited($node);
-		if(!empty($node->child)){
-			foreach($node->child as $_current){
-				/**tidyNode*/
-				if(!$this->isVisited($_current)){
-					$this->dfsFind($selectors, $_current, $idx);
-					$md5_node = $this->md5Node($_current);
-					$this->allNodesMap[$md5_node] = $_current;			
-					//echo $_current->value . "\n";		
-					$this->searchNodeBySelectors($selectors, $_current);
-				}
-			}
-		}
+		// 
 		if(empty($this->findedNodesMap)){
 			return null;
 		}else{
@@ -113,26 +108,44 @@ class DOMParser{
 				return $this->findedNodesMap[$idx];
 			}
 			foreach($this->findedNodesMap as $key=>$val){
-				echo $val->value;
+				echo $val->value."\n";
 			}
 			return $this->findedNodesMap[$idx];
 		}
 		return 'unmatched';
-		//echo $node->value . "\n";
+	}
+
+	/**
+	 * DFS find
+	 * TODO optimization
+	 */
+	protected function dfsFind($selectors, $node){
+		$this->setVisited($node);
+		if(!empty($node->child)){
+			foreach($node->child as $_current){
+				/**tidyNode*/
+				if(!$this->isVisited($_current)){
+					$this->dfsFind($selectors, $_current);
+					$md5_node = $this->md5Node($_current);
+					$this->allNodesMap[$md5_node] = $_current;			
+					//echo $_current->value . "\n";		
+					$this->searchNodeBySelectors($selectors, $_current);
+				}
+			}
+		}
+		
 	}
 
 	/**
 	 * BFS find
 	 */
-	protected function bfsFind($selector, $node, $idx){
+	protected function bfsFind($selector, $node){
 		//TODO
 	}
 
-	/**
-	 * 
-	 */
 	protected function searchNodeBySelectors($selectors, $node){
 		$flag = true;
+		/** 1 element in $selectors */
 		foreach($selectors as $key => $val){
 			$selector = $selectors[$key];
 			$ret = $this->searchNodeBySelector($selector, $node);		
@@ -141,13 +154,17 @@ class DOMParser{
 		if($flag){
 			$md5_node = $this->md5Node($node);
 			//$this->findedNodesMap[$md5_node] = $node;	
-			$this->findedNodesMap[] = $node;	
+			if(!array_key_exists($md5_node, $this->findedNodesMap)){
+				$this->findedNodesMap[] = $node;	
+			}			
 		}
+		return $flag;
 	}
 
 	/**
-	 * search node by the specified array selector
-	 *  more efficient by the level search.
+	 * search node use the right to left mode, more efficient by the level search.
+	 * https://github.com/jquery/jquery/blob/master/external/sizzle/dist/sizzle.js
+	 * http://davidwalsh.name/selectors right-to-left
 	 * 
 	 *  selector[0]					node
 	 *  selector[1]			node_1   	  node_1
@@ -160,28 +177,13 @@ class DOMParser{
 			$currrent_node = $node;
 
 			//foreach($selector as $_selector){	
-			for($i=0; $i < count($selector); $i++){
-				/**capitable with the selector structure*/				
-				$ret = $this->searchNode($selector, $currrent_node);
-				//print_r(json_encode($ret)."\n");
-
+			for($i=count($selector)-1; $i >=0; $i--){
+				/**sizzle selector right to left*/				
+				$ret = $this->searchNode($selector, $currrent_node, $i);
 				if($ret == false){
 					$flag = false;
 					break;
-				}else{
-					/*if(!empty($currrent_node)){
-						$child_node = $currrent_node->child;
-						foreach ($child_node as $k => $v) {
-							echo 'xx';
-							if(!empty($v->attribute)){
-								$this->searchNode($selector[$i], $v);
-							}
-							
-						}
-					}*/
-					continue;
-				}
-				
+				}				
 			}
 			return $flag;				
 		}
@@ -196,28 +198,23 @@ class DOMParser{
 	 *  ...			   ...
 	 */
 	protected function getLevelKChildNodes($node, $levelK){
-			
-			foreach($node->child as $val){				
-				$this->getLevelKChildNodes($val);
-				echo $val->value."\n";				
-			}
-
-			$child_node = array();
-			if(!empty($node)){
-				foreach($node->child as $val){
-					$_child_node = $this->getLevelKChildNodes($val, $levelK-1);
-					$child_node[] = $_child_node;
+		if(!empty($node->child) || $levelK == 0){
+			if(!empty($node->child)){
+				foreach($node->child as $val){		
+					$this->getLevelKChildNodes($val,$levelK-1);		
 				}
 			}			
-		}
-		
+		}else{
+			$this->levelNodesMap[] = $node;
+		}			
 	}
 
 	/**
 	 * search node by the selector
+	 * right to left
 	 */
-	protected function searchNode(array $selector, tidyNode $node){
-		list ( $tag, $key, $val, $exp, $no_key ) = $selector; 
+	protected function searchNode(array $selector, tidyNode $node, $idx){
+		list ( $tag, $key, $val, $exp, $no_key ) = $selector[$idx]; 
 
 		$pass = true;
 		if ($tag == '*' && !$key) {
@@ -390,13 +387,13 @@ class DOMParser{
 		$this->dom = $this->preParse();
 
 		$tidy = new tidy();
-		/**doesn't support user-defined tags such as <block> <un>*/
+		/**doesn't support user-defined tags such as <block> <un> til now*/
 		$tidy->parseString($this->dom, array(), 'utf8');
 		$this->dom = $tidy->body();
 
 		$this->dom = $this->postParse();
 
-		print_r($this->dom);
+		//print_r($this->dom);
 		return $this->dom;		
 	}
 
@@ -549,7 +546,7 @@ class DOMParser{
 			$selectors [] = $result;
 		}
 
-		print_r($selectors);
+		//print_r($selectors);
 		return $selectors;
 	}
 }

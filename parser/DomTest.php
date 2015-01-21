@@ -6,11 +6,10 @@ $str = '<p class="blanket" id="pid">start<span lang="en">en</span><span country=
 $style = 'p.blanket';
 
 $parser = new DOMParser($str);
-/*$parser->find('span');
-$parser->find('p#blanket');
-$parser->find('p.blanket');*/
+$parser->find('span');
+$parser->find('p#pid');
+$parser->find('p.blanket');
 $parser->find('span[lang=en]');
-
 
 /*$selector = $parser->parseSelectors('p');
 $selector = $parser->parseSelectors('p#pid'); //match wrong id='p++'
