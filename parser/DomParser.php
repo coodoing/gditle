@@ -72,7 +72,9 @@ class DOMParser{
 			$this->parse();
 		} 
 		($this->getLevelKChildNodes($this->dom, 1));
+		$this->genExtNode($this->dom);
 
+		//print_r($this->allExtNodesMap);
 		//print_r($this->levelNodesMap);		
 	}
 
@@ -88,6 +90,7 @@ class DOMParser{
 	protected function restore(){
 		$this->levelNodesMap = array();
 		$this->findedNodesMap = array();
+		$this->visited = array();
 	}
 
 	protected function cleanDom($node){
@@ -100,8 +103,30 @@ class DOMParser{
 		unset($node);
 	}
 
-	protected function genExtNode(){
-		
+	protected function genExtNode($node){
+
+		$queue = array();
+		$this->setVisited($node);
+		array_unshift($queue, $node); 
+		while(!empty($queue)){
+			$pop_node = array_pop($queue);
+			//echo $pop_node->value."---\n";
+
+			$_current = $pop_node;
+			$md5_node = $this->md5Node($_current);
+			$rule = $this->parseNodeRule($_current);
+			$extnode = new ExtendTidyNode($rule, $_current, 0 /*$this->getNodeLevel($_current)*/, $md5_node, $_current->type);
+			$this->allExtNodesMap[$md5_node] = $extnode;
+
+			if(!empty($pop_node->child)){
+				foreach($pop_node->child as $_current){
+					if(!$this->isVisited($_current)){
+						$this->setVisited($_current);
+						array_unshift($queue, $_current);
+					}
+				}
+			}
+		}
 	}
 
 	public function find($selectorString, $idx = 0){
@@ -153,10 +178,9 @@ class DOMParser{
 					$md5_node = $this->md5Node($_current);
 					$this->allNodesMap[$md5_node] = $_current;		
 
-					$rule = $this->parseNodeRule($_current);
-
-					$extnode = new ExtendTidyNode($rule, $_current, $this->getNodeLevel($_current), $md5_node, $_current->type);
-					$this->allExtNodesMap[$md5_node] = $extnode;	
+					//$rule = $this->parseNodeRule($_current);
+					//$extnode = new ExtendTidyNode($rule, $_current, $this->getNodeLevel($_current), $md5_node, $_current->type);
+					//$this->allExtNodesMap[$md5_node] = $extnode;	
 
 					//echo $_current->value . "\n";		
 					$this->searchNodeBySelectors($selectors, $_current);
