@@ -77,7 +77,6 @@ class DOMParser{
 	 * DFS find
 	 */
 	protected function dfsFind($selectors, $node, $idx){
-
 		$this->setVisited($node);
 		if(!empty($node->child)){
 			foreach($node->child as $_current){
@@ -87,17 +86,27 @@ class DOMParser{
 					$md5_node = $this->md5Node($_current);
 					$this->allNodesMap[$md5_node] = $_current;			
 					//echo $_current->value . "\n";		
-					$this->searchNodeBySelector($selectors, $_current);
+					$this->searchNodeBySelectors($selectors, $_current);
 				}
 			}
 		}
 		if(empty($this->findedNodesMap)){
 			return null;
 		}else{
+			$count = count($this->findedNodesMap);
+			if($idx >= $count){
+				return $this->findedNodesMap[0];
+			}
+			if($idx < 0){
+				$idx = $count + $idx;
+				return $this->findedNodesMap[$idx];
+			}
 			foreach($this->findedNodesMap as $key=>$val){
 				echo $val->value;
 			}
+			return $this->findedNodesMap[$idx];
 		}
+		return 'unmatched';
 		//echo $node->value . "\n";
 	}
 
@@ -108,28 +117,52 @@ class DOMParser{
 		//TODO
 	}
 
-	protected function searchNodeBySelector($selectors, $node){
+	/**
+	 * 
+	 */
+	protected function searchNodeBySelectors($selectors, $node){
+		$flag = true;
 		foreach($selectors as $key => $val){
 			$selector = $selectors[$key];
+			$ret = $this->searchNodeBySelector($selector, $node);		
+			$flag = $ret;	
+		}
+		if($flag){
+			$md5_node = $this->md5Node($node);
+			//$this->findedNodesMap[$md5_node] = $node;	
+			$this->findedNodesMap[] = $node;	
+		}
+	}
 
-			if(!empty($selector)){
-				foreach($selector as $_selector){					
-					$ret = $this->searchNode($_selector, $node);
-					//print_r(json_encode($ret)."\n");
+	protected function searchNodeBySelector($selector, $node){
+		if(!empty($selector)){
+			$flag = true;
+			$currrent_node = $node;
 
-					if($ret == false){
-						break;
-					}else{
-						$md5_node = $this->md5Node($node);
-						$this->findedNodesMap[$md5_node] = $node;
+			//foreach($selector as $_selector){	
+			for($i=0; $i < count($selector); $i++){
+				/**capitable with the selector structure*/				
+				$ret = $this->searchNode($selector[$i], $currrent_node);
+				//print_r(json_encode($ret)."\n");
+				if($ret == false){
+					$flag = false;
+					break;
+				}else{
+					continue;
+				}
+				if(!empty($currrent_node)){
+					$child_node = $currrent_node->child;
+					foreach ($child_node as $k => $v) {
+						$this->searchNodeBySelector($selector[$i], $v);
 					}
 				}
-			}			
+			}
+			return $flag;				
 		}
 	}
 	
 	/**
-	 * search node
+	 * search node by the selector
 	 */
 	protected function searchNode(array $selector, tidyNode $node){
 		list ( $tag, $key, $val, $exp, $no_key ) = $selector; 
@@ -264,15 +297,6 @@ class DOMParser{
 	}
 
 	/**
-	 * string match function 
-	 * test if str1 is the substr of str2 or not
-	 */
-	protected function stringMatch($str1, $str2){
-		//TODO
-
-	}
-
-	/**
 	 * get tidynody object from the md5 hash
 	 */
 	protected function getNodeByMd5Hash($node){
@@ -360,6 +384,9 @@ class DOMParser{
         return $string;
 	}
 
+	/**
+	 * attribute match function
+	 */
 	protected function attributeMatch($exp, $pattern, $node_value) {
 		$pattern = strtolower($pattern);
 		$node_value = strtolower($node_value);
@@ -410,7 +437,7 @@ class DOMParser{
 	 *	Universal selectors * ns|* *|*   *[lang^=en]
 	 *	Attribute selectors  (?:([~|!*^$]?=)[\"']?(.*?)[\"']?)   [attr=value][attr~=value][attr|=value][attr^=value][attr$=value][attr*=value]
 	 *
-	 * #TODO
+	 * #TODO user-defined selector parser
 	 *  Combinators:
 	 *	Adjacent sibling selectors A + B
 	 *	General sibling selectors A ~ B

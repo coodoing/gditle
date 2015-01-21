@@ -3,7 +3,7 @@
 require_once 'DOMParser.php';
 
 $str = '<p class="blanket" id="pid">start<span lang="en">mmm</span>end</p>';
-$style = 'p.blanket span b';
+$style = 'p.blanket span';
 
 $parser = new DOMParser($str);
 $parser->find($style);
