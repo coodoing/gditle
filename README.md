@@ -16,7 +16,12 @@ lexer scan the input string and get tokens from it. lexer result(*var_dump()*):
 Array ( [0] => <p> [1] => p_start [2] => <block> [3] => block_info [4] => <b> [5] => bold> [6] => </b> [7] => </block> [8] => <block> [9] => info2 [10] => </block> [11] => p_end [12] => </p> )
 ```
 
-**parser**
+**dom parser**
+
+
+
+
+**ast parser**
 
 matched tokenmap(*var_dump()*):
 
@@ -288,7 +293,7 @@ Array
 
 ```
 
-**Render**
+**render**
 
 
 **usage**

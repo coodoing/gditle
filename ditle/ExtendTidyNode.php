@@ -17,6 +17,9 @@ class ExtendTidyNode{
 
 	protected $type;
 
+	//protected $id;
+	//protected $priority;
+
 	public function __construct($_rule, $_node, $_level, $_md5, $_type){
 		$this->rule = $_rule;
 		$this->node = $_node;
@@ -32,6 +35,6 @@ class ExtendTidyNode{
 	public function getBaseNode(){
 		return $this->node;
 	}
-	
-	
+
+
 }

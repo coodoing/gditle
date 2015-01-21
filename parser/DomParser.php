@@ -1,5 +1,12 @@
 <?php
 
+require_once '../ditle/ExtendTidyNode.php';
+
+require_once '../ditle/Rule.php';
+require_once '../ditle/FontRule.php';
+require_once '../ditle/ListRule.php';
+require_once '../ditle/PositionRule.php';
+
 class DOMParser{
 	
 	/**
@@ -30,9 +37,19 @@ class DOMParser{
 	protected $visited = array();
 
 	/**
-	 * global all node map 
+	 * global all extendtidynode map 
+	 */
+	protected $allExtNodesMap = array();
+
+	/**
+	 * global all tidynode map 
 	 */
 	protected $allNodesMap = array();
+
+	/**
+	 * global all tidynode map 
+	 */
+	protected $allNodesLevelMap = array();
 
 	/**
 	 * finded node map
@@ -40,7 +57,7 @@ class DOMParser{
 	protected $findedNodesMap = array();
 
 	/**
-	 * node's level map
+	 * node's level map, changes when the root node changes
 	 */
 	protected $levelNodesMap = array();
 
@@ -55,7 +72,8 @@ class DOMParser{
 			$this->parse();
 		} 
 		($this->getLevelKChildNodes($this->dom, 1));
-		print_r($this->levelNodesMap);		
+
+		//print_r($this->levelNodesMap);		
 	}
 
 	public function __destruct(){
@@ -82,6 +100,10 @@ class DOMParser{
 		unset($node);
 	}
 
+	protected function genExtNode(){
+		
+	}
+
 	public function find($selectorString, $idx = 0){
 
 		$this->restore();
@@ -95,6 +117,7 @@ class DOMParser{
 			$this->bfsFind($selectors, $this->dom);
 		}
 
+		//print_r($this->allExtNodesMap);
 		// 
 		if(empty($this->findedNodesMap)){
 			return null;
@@ -126,14 +149,20 @@ class DOMParser{
 				/**tidyNode*/
 				if(!$this->isVisited($_current)){
 					$this->dfsFind($selectors, $_current);
+
 					$md5_node = $this->md5Node($_current);
-					$this->allNodesMap[$md5_node] = $_current;			
+					$this->allNodesMap[$md5_node] = $_current;		
+
+					$rule = $this->parseNodeRule($_current);
+
+					$extnode = new ExtendTidyNode($rule, $_current, $this->getNodeLevel($_current), $md5_node, $_current->type);
+					$this->allExtNodesMap[$md5_node] = $extnode;	
+
 					//echo $_current->value . "\n";		
 					$this->searchNodeBySelectors($selectors, $_current);
 				}
 			}
-		}
-		
+		}		
 	}
 
 	/**
@@ -142,6 +171,59 @@ class DOMParser{
 	protected function bfsFind($selector, $node){
 		//TODO
 	}
+
+	/**
+	 * dfs traverse
+	 * http://en.wikipedia.org/wiki/Depth-first_search
+	 *
+	 * 1  procedure DFS(G,v):
+	 * 2      label v as discovered
+	 * 3      for all edges from v to w in G.adjacentEdges(v) do
+	 * 4          if vertex w is not labeled as discovered then
+	 * 5              recursively call DFS(G,w)
+	 *
+	 */
+	protected function dfsTraverse($node){
+		$this->setVisited($node);
+		if(!empty($node->child)){
+			foreach($node->child as $_current){
+				/**tidyNode*/
+				if(!$this->isVisited($_current)){
+					$this->dfsTraverse($_current);
+					echo $_current->value."\n";
+				}
+			}
+		}
+		//echo $_current->value."\n";
+	}
+
+	/**
+	 * bfs traverse
+	 * http://en.wikipedia.org/wiki/Breadth-first_search
+	 *
+	 */
+	protected function bfsTraverse($node){		
+
+		$queue = array();
+		$this->setVisited($node);
+		/**be careful about the queue structure*/
+		array_unshift($queue, $node); 
+		while(!empty($queue)){
+			$pop_node = array_pop($queue);
+			echo $pop_node->value."\n";
+
+			if(!empty($pop_node->child)){
+				foreach($pop_node->child as $_current){
+					if(!$this->isVisited($_current)){
+						$this->setVisited($_current);
+						array_unshift($queue, $_current);
+					}
+				}
+			}
+		}
+
+	}
+
 
 	protected function searchNodeBySelectors($selectors, $node){
 		$flag = true;
@@ -189,26 +271,7 @@ class DOMParser{
 		}
 	}
 
-	/**
-	 * get the level-k's child nodes
-	 * 
-	 *       0					node
-	 *       1			node_1   	  node_1
-	 *  	 2	   node_2  node_2   node_2   node_2
-	 *  ...			   ...
-	 */
-	protected function getLevelKChildNodes($node, $levelK){
-		if(!empty($node->child) || $levelK == 0){
-			if(!empty($node->child)){
-				foreach($node->child as $val){		
-					$this->getLevelKChildNodes($val,$levelK-1);		
-				}
-			}			
-		}else{
-			$this->levelNodesMap[] = $node;
-		}			
-	}
-
+	
 	/**
 	 * search node by the selector
 	 * right to left
@@ -265,7 +328,63 @@ class DOMParser{
 		}
 	}
 
-	public function getNodeText($name){
+	/**
+	 * get the level-k's child nodes
+	 * 
+	 *       0					node
+	 *       1			node_1   	  node_1
+	 *  	 2	   node_2  node_2   node_2   node_2
+	 *  ...			   ...
+	 */
+	protected function getLevelKChildNodes($node, $levelK){
+		if(!empty($node->child) || $levelK == 0){
+			if(!empty($node->child)){
+				foreach($node->child as $val){		
+					$this->getLevelKChildNodes($val,$levelK-1);		
+				}
+			}			
+		}else{
+			$this->levelNodesMap[] = $node;
+		}			
+	}
+
+	protected function getNodeSiblings($node){
+		$parent = $this->getParent();
+		$siblings = array();
+		if(!empty($parent)){
+			$hash = $this->md5Node($node);
+			foreach($parent->child as $val){
+				if($this->md5Node($val)!=$hash){
+					$siblings[] = $val;
+				}
+			}
+		}
+		return $siblings;
+	}
+
+	protected function getNodeParant($node){
+		return $node->getParent();
+	}
+
+	protected function getNodeChildren($node){
+		if(!empty($node->child))
+			return $node->child;
+		return null;
+	}
+
+	/**
+	 * get the level of node
+	 */
+	protected function getNodeLevel($node, $level = 0 ){
+		$parent = $node->getParent();
+		if($parent != $this->dom){
+			$this->getNodeLevel($parent, $level + 1 );
+		}
+		return $level;
+
+	}
+
+	protected function getNodeText($name){
 		if(!empty($node)){
 			return $node->value;			
 		}
@@ -274,7 +393,7 @@ class DOMParser{
 	/**
 	 * get attribute of the node
 	 */
-	public function getNodeAttribute($node){
+	protected function getNodeAttribute($node){
 		if(!empty($node)){
 			return $node->attribute;
 		}
@@ -293,58 +412,7 @@ class DOMParser{
 		}
 	}
 
-	/**
-	 * dfs traverse
-	 * http://en.wikipedia.org/wiki/Depth-first_search
-	 *
-	 * 1  procedure DFS(G,v):
-	 * 2      label v as discovered
-	 * 3      for all edges from v to w in G.adjacentEdges(v) do
-	 * 4          if vertex w is not labeled as discovered then
-	 * 5              recursively call DFS(G,w)
-	 *
-	 */
-	protected function dfsTraverse($node){
-		$this->setVisited($node);
-		if(!empty($node->child)){
-			foreach($node->child as $_current){
-				/**tidyNode*/
-				if(!$this->isVisited($_current)){
-					$this->dfsTraverse($_current);
-					echo $_current->value."\n";
-				}
-			}
-		}
-		//echo $_current->value."\n";
-	}
-
-	/**
-	 * bfs traverse
-	 * http://en.wikipedia.org/wiki/Breadth-first_search
-	 *
-	 */
-	protected function bfsTraverse($node){		
-
-		$queue = array();
-		$this->setVisited($node);
-		/**be careful about the queue structure*/
-		array_unshift($queue, $node); 
-		while(!empty($queue)){
-			$pop_node = array_pop($queue);
-			echo $pop_node->value."\n";
-
-			if(!empty($pop_node->child)){
-				foreach($pop_node->child as $_current){
-					if(!$this->isVisited($_current)){
-						$this->setVisited($_current);
-						array_unshift($queue, $_current);
-					}
-				}
-			}
-		}
-
-	}
-
+	
 	/**
 	 * get tidynody object from the md5 hash
 	 */
@@ -352,6 +420,17 @@ class DOMParser{
 		$md5_node = $this->md5Node($node);
 		if(!empty($this->allNodesMap)){
 			return $this->allNodesMap[$md5_node];
+		}
+		return null;
+	}
+
+	/**
+	 * get extend tidynody object from the md5 hash
+	 */
+	protected function getExtNodeByMd5Hash($extnode){
+		$md5_node = $this->md5Node($extnode);
+		if(!empty($this->allExtNodesMap)){
+			return $this->allExtNodesMap[$md5_node];
 		}
 		return null;
 	}
@@ -379,8 +458,15 @@ class DOMParser{
 		$this->visited[$node_key] = true;
 	}
 
+	protected function parseNodeRule($node){
+		$font = new FontRule;
+		$rule = new Rule($font);
+		return $rule;
+	}
+
 	/**
 	 * use tidy to parse string 
+	 * http://tidy.cvs.sourceforge.net/viewvc/tidy/tidy/src
 	 */
 	public function parse(){
 
