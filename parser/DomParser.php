@@ -32,11 +32,6 @@ class DOMParser{
 	protected $traverse;
 
 	/**
-	 * tidynode visited or not
-	 */
-	protected $visited = array();
-
-	/**
 	 * global all extendtidynode map 
 	 */
 	protected $allExtNodesMap = array();
@@ -50,6 +45,11 @@ class DOMParser{
 	 * global all tidynode map 
 	 */
 	protected $allNodesLevelMap = array();
+
+	/**
+	 * tidynode visited or not
+	 */
+	protected $visited = array();
 
 	/**
 	 * finded node map
@@ -71,15 +71,15 @@ class DOMParser{
 		}else{
 			$this->parse();
 		} 
-		($this->getLevelKChildNodes($this->dom, 1));
+		//($this->getLevelKChildNodes($this->dom, 1));
+		$this->createDomNodesLevel($this->dom);
 		$this->createExtNode($this->dom);
+		//$base = $this->dom->child[0]->child[0];
+		//$this->createNodeLevel($base, $base);
+		//print_r($this->dom->getParent()->getParent()->getParent());	
 
-		$this->createNodeLevel($this->dom);
-
-		print_r($allNodesLevelMap);
-
-		//print_r($this->allExtNodesMap);
-		//print_r($this->levelKChildNodesMap);		
+		//print_r($this->allNodesLevelMap);
+		//print_r($this->allExtNodesMap);	
 	}
 
 	public function __destruct(){
@@ -110,6 +110,8 @@ class DOMParser{
 
 	protected function createExtNode($node){
 
+		$this->restore();
+		
 		$queue = array();
 		$this->setVisited($node);
 		array_unshift($queue, $node); 
@@ -120,7 +122,7 @@ class DOMParser{
 			$_current = $pop_node;
 			$md5_node = $this->md5Node($_current);
 			$rule = $this->parseNodeRule($_current);
-			$extnode = new ExtendTidyNode($rule, $_current, 0 /*$this->getNodeLevel($_current)*/, $md5_node, $_current->type);
+			$extnode = new ExtendTidyNode($rule, $_current, $this->getNodeLevel($_current), $md5_node, $_current->type);
 			$this->allExtNodesMap[$md5_node] = $extnode;
 
 			if(!empty($pop_node->child)){
@@ -147,7 +149,7 @@ class DOMParser{
 			$this->bfsFind($selectors, $this->dom);
 		}
 
-		//print_r($this->allExtNodesMap);
+		//print_r($this->findedNodesMap);
 		// 
 		if(empty($this->findedNodesMap)){
 			return null;
@@ -161,7 +163,8 @@ class DOMParser{
 				return $this->findedNodesMap[$idx];
 			}
 			foreach($this->findedNodesMap as $key=>$val){
-				echo $val->value."\n";
+				$node = $this->getNodeByMd5Hash($val);
+				echo $node->value."\n";
 			}
 			return $this->findedNodesMap[$idx];
 		}
@@ -249,7 +252,6 @@ class DOMParser{
 
 	}
 
-
 	protected function searchNodeBySelectors($selectors, $node){
 		$flag = true;
 		/** 1 element in $selectors */
@@ -262,7 +264,7 @@ class DOMParser{
 			$md5_node = $this->md5Node($node);
 			//$this->findedNodesMap[$md5_node] = $node;	
 			if(!array_key_exists($md5_node, $this->findedNodesMap)){
-				$this->findedNodesMap[] = $node;	
+				$this->findedNodesMap[] = $md5_node;	// ??
 			}			
 		}
 		return $flag;
@@ -348,9 +350,9 @@ class DOMParser{
 		}
 		if ($pass) {
 			return $node;
-		} else {
+		} /*else {
 			return false;
-		}
+		}*/
 	}
 
 	/**
@@ -397,13 +399,33 @@ class DOMParser{
 		return null;
 	}
 
-	protected function createNodeLevel($node){
-		$parent = $node->getParent();
-		if($parent != $this->dom && $parent !=null ){
-			$this->createNodeLevel($parent, $level + 1 );
+	protected function createDomNodesLevel($node){
+		$this->setVisited($node);
+		if(!empty($node->child)){
+			foreach($node->child as $_current){
+				/**tidyNode*/
+				if(!$this->isVisited($_current)){
+					$this->createDomNodesLevel($_current);
+					$this->createNodeLevel($_current,$_current);
+				}
+			}
 		}
-		echo $level."\n";
-		return $level;
+	}
+
+	protected function createNodeLevel($node, $base, $level= 1){		
+		if($node != $this->dom){
+			$parent = $node->getParent();
+			if($parent != null){
+				$this->createNodeLevel($parent, $base, $level + 1);	
+			}			
+		}		
+
+		/**reverse order to output*/
+		$md5_node = $this->md5Node($base);			
+		if(!array_key_exists($md5_node, $this->allNodesLevelMap))	{			
+			$this->allNodesLevelMap[$md5_node] = $level;
+			//echo "key:$md5_node -- level:$level.\n";
+		}					
 	}
 
 	/**
@@ -446,10 +468,9 @@ class DOMParser{
 	/**
 	 * get tidynody object from the md5 hash
 	 */
-	protected function getNodeByMd5Hash($node){
-		$md5_node = $this->md5Node($node);
-		if(!empty($this->allNodesMap)){
-			return $this->allNodesMap[$md5_node];
+	protected function getNodeByMd5Hash($hash){
+		if(isset($this->allNodesMap[$hash])){
+			return $this->allNodesMap[$hash];
 		}
 		return null;
 	}
