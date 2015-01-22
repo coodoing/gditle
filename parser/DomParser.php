@@ -59,7 +59,7 @@ class DOMParser{
 	/**
 	 * node's level map, changes when the root node changes
 	 */
-	protected $levelNodesMap = array();
+	protected $levelKChildNodesMap = array();
 
 	public function __construct($string){
 
@@ -72,10 +72,14 @@ class DOMParser{
 			$this->parse();
 		} 
 		($this->getLevelKChildNodes($this->dom, 1));
-		$this->genExtNode($this->dom);
+		$this->createExtNode($this->dom);
+
+		$this->createNodeLevel($this->dom);
+
+		print_r($allNodesLevelMap);
 
 		//print_r($this->allExtNodesMap);
-		//print_r($this->levelNodesMap);		
+		//print_r($this->levelKChildNodesMap);		
 	}
 
 	public function __destruct(){
@@ -88,9 +92,10 @@ class DOMParser{
 	}
 
 	protected function restore(){
-		$this->levelNodesMap = array();
-		$this->findedNodesMap = array();
+
 		$this->visited = array();
+		$this->levelKChildNodesMap = array();
+		$this->findedNodesMap = array();		
 	}
 
 	protected function cleanDom($node){
@@ -103,7 +108,7 @@ class DOMParser{
 		unset($node);
 	}
 
-	protected function genExtNode($node){
+	protected function createExtNode($node){
 
 		$queue = array();
 		$this->setVisited($node);
@@ -177,10 +182,6 @@ class DOMParser{
 
 					$md5_node = $this->md5Node($_current);
 					$this->allNodesMap[$md5_node] = $_current;		
-
-					//$rule = $this->parseNodeRule($_current);
-					//$extnode = new ExtendTidyNode($rule, $_current, $this->getNodeLevel($_current), $md5_node, $_current->type);
-					//$this->allExtNodesMap[$md5_node] = $extnode;	
 
 					//echo $_current->value . "\n";		
 					$this->searchNodeBySelectors($selectors, $_current);
@@ -368,7 +369,7 @@ class DOMParser{
 				}
 			}			
 		}else{
-			$this->levelNodesMap[] = $node;
+			$this->levelKChildNodesMap[] = $node;
 		}			
 	}
 
@@ -396,16 +397,21 @@ class DOMParser{
 		return null;
 	}
 
+	protected function createNodeLevel($node){
+		$parent = $node->getParent();
+		if($parent != $this->dom && $parent !=null ){
+			$this->createNodeLevel($parent, $level + 1 );
+		}
+		echo $level."\n";
+		return $level;
+	}
+
 	/**
 	 * get the level of node
 	 */
 	protected function getNodeLevel($node, $level = 0 ){
-		$parent = $node->getParent();
-		if($parent != $this->dom){
-			$this->getNodeLevel($parent, $level + 1 );
-		}
-		return $level;
-
+		$md5_node = $this->md5Node($node);
+		return $this->allNodesLevelMap[$md5_node];
 	}
 
 	protected function getNodeText($name){
