@@ -4,6 +4,12 @@ domparser use the tidy extentsion to parse the string to dom structure and exten
 
 [tidy](http://php.net/manual/en/book.tidy.php) is a binding for the Tidy HTML clean and repair utility which allows you to not only clean and otherwise manipulate HTML documents, but also traverse the document tree. But it can only parse html tags. 
 
+input string:
+
+```
+<p class="blanket" id="pid">start<span lang="en">en</span><span country="uk">uk</span>end</p>
+```
+
 ## usage
 
 ```
@@ -34,13 +40,6 @@ $parser->find('span[lang=en]');
 
 ## dom 
 
-input string:
-
-```
-<p class="blanket" id="pid">start<span lang="en">en</span><span country="uk">uk</span>end</p>
-```
-
-output :
 
 ```
 Array

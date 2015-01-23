@@ -297,7 +297,6 @@ class DOMParser{
 			return $flag;				
 		}
 	}
-
 	
 	/**
 	 * search node by the selector
