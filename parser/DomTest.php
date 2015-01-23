@@ -12,7 +12,7 @@ $parser->find('p.blanket');
 $parser->find('span[lang=en]');
 
 /*$selector = $parser->parseSelectors('p');
-$selector = $parser->parseSelectors('p#pid'); //match wrong id='p++'
+$selector = $parser->parseSelectors('p#pid'); //match errror id='p++'
 $selector = $parser->parseSelectors('p.blank');
 $selector = $parser->parseSelectors('*[lang="en"]');
 $selector = $parser->parseSelectors('span[lang]');

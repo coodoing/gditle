@@ -400,6 +400,7 @@ class DOMParser{
 	}
 
 	protected function createDomNodesLevel($node){
+		$this->createNodeLevel($node,$node);
 		$this->setVisited($node);
 		if(!empty($node->child)){
 			foreach($node->child as $_current){
