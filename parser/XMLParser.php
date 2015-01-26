@@ -7,16 +7,16 @@ class XMLParser{
 
 	public function extractAttributes( $html, array $options ) {
 		$document = $this->createDocument( $html );
-		$options = Hash::normalize( $options, [ ]);
+		$options = $this->normalize( $options, [ ]);
 		$data = [ ];
 		foreach ( $options as $name => $required ) {
 			$tags = $document->getElementsByTagName( $name );
-			$required = Hash::normalize(( array )$required, '' );
+			$required = $this->normalize(( array )$required, '' );
 			$data[ $name ] = [ ];
-			foreach ( $tags as $Tag ) {
-				if ( $Tag->hasAttributes( )) {
+			foreach ( $tags as $_tag ) {
+				if ( $_tag->hasAttributes( )) {
 					$attributes = $this->extractAttributesFromTag(
-						$Tag,
+						$_tag,
 						$required
 					);
 					if ( !empty( $attributes )) {
@@ -67,9 +67,9 @@ class XMLParser{
 	 *	Extracts attributes from the given tag.
 	 *
 	 */
-	protected function extractAttributesFromTag( DOMNode $Tag, array $required ) {
+	protected function extractAttributesFromTag( DOMNode $tag, array $required ) {
 		$attributes = [ ];
-		foreach ( $Tag->attributes as $name => $Attribute ) {
+		foreach ( $tag->attributes as $name => $Attribute ) {
 			if ( !empty( $required )) {
 				if ( isset( $required[ $name ])) {
 					$pattern = $required[ $name ];
@@ -86,5 +86,22 @@ class XMLParser{
 		return empty( $diff )
 			? $attributes
 			: [ ];
+	}
+	
+	/**
+	 *	Every element that is numerically indexed becomes a key, given
+	 *	$default as value.
+	 * 
+	 */
+	public static function normalize( array $data, $default ) {
+		$normalized = [ ];
+		foreach ( $data as $key => $value ) {
+			if ( is_numeric( $key )) {
+				$key = $value;
+				$value = $default;
+			}
+			$normalized[ $key ] = $value;
+		}
+		return $normalized;
 	}
 }
